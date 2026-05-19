@@ -1,63 +1,79 @@
 package model;
 
-import exception.Nullvalueexception;
+import exception.NullValueException;
 
 public class CommandLine {
 
-    private Integer id;
     private Integer quantite;
-    private Beer    beer;
-    private Integer commandeId;   // clé étrangère vers Commande
+    private Double realPrice; // Provient du schéma relationnel (prix au moment de la commande)
+    private Integer orderId;
+    private Integer beerId;
 
-    public CommandLine(Integer id, Integer quantite, Beer beer, Integer commandeId)
-            throws Nullvalueexception {
-        setId(id);
+    // Si vous chargez l'objet Beer pour le calcul business :
+    private Beer beer;
+
+    public CommandLine(Integer quantite, Double realPrice, Integer orderId, Integer beerId) throws NullValueException {
         setQuantite(quantite);
-        setBeer(beer);
-        setCommandeId(commandeId);
+        setRealPrice(realPrice);
+        setOrderId(orderId);
+        setBeerId(beerId);
     }
 
     // ── Getters / Setters ──────────────────────────────────────────────────────
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getQuantite() {
+        return quantite;
+    }
 
-    public Integer getQuantite() { return quantite; }
-    public void setQuantite(Integer quantite) throws Nullvalueexception {
-        if (quantite != null && quantite > 0)
+    public void setQuantite(Integer quantite) throws NullValueException {
+        if (quantite != null && quantite > 0) {
             this.quantite = quantite;
-        else
-            throw new Nullvalueexception("La quantité doit être strictement positive");
+        } else {
+            throw new NullValueException("La quantité doit être supérieure à 0");
+        }
     }
 
-    public Beer getBeer() { return beer; }
-    public void setBeer(Beer beer) throws Nullvalueexception {
-        if (beer != null)
-            this.beer = beer;
-        else
-            throw new Nullvalueexception("La bière ne peut pas être nulle");
+    public Double getRealPrice() {
+        return realPrice;
     }
 
-    public Integer getCommandeId() { return commandeId; }
-    public void setCommandeId(Integer commandeId) { this.commandeId = commandeId; }
+    public void setRealPrice(Double realPrice) {
+        this.realPrice = realPrice;
+    }
 
-    // ── Méthodes métier ────────────────────────────────────────────────────────
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
+
+    public Integer getBeerId() {
+        return beerId;
+    }
+
+    public void setBeerId(Integer beerId) {
+        this.beerId = beerId;
+    }
+
+    public Beer getBeer() {
+        return beer;
+    }
+
+    public void setBeer(Beer beer) {
+        this.beer = beer;
+    }
+
+    // ── Méthode Métier (UML) ───────────────────────────────────────────────────
 
     /**
-     * Calcule le sous-total de cette ligne : quantité × prix unitaire de la bière.
-     *
-     * @return Sous-total en euros
+     * Calcule le sous-total de la ligne en fonction de la quantité et du prix réel.
      */
     public double calculerSousTotal() {
-        if (quantite != null && beer != null && beer.getPrice() != null)
-            return quantite * beer.getPrice();
+        if (realPrice != null && quantite != null) {
+            return realPrice * quantite;
+        }
         return 0.0;
-    }
-
-    // ── toString ───────────────────────────────────────────────────────────────
-
-    @Override
-    public String toString() {
-        return beer.getNom() + " x" + quantite + " = " + calculerSousTotal() + " €";
     }
 }

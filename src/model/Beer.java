@@ -1,18 +1,18 @@
 package model;
 
-import exception.Nullvalueexception;
+import exception.NullValueException;
 
 public class Beer {
 
     private Integer beerId;
-    private String  nom;
+    private String  name;
     private Double  price;
     private String  type;       // ex : IPA, Stout, Blonde, Trappiste…
 
-    public Beer(Integer beerId, String nom, Double price, String type)
-            throws Nullvalueexception {
+    public Beer(Integer beerId, String name, Double price, String type)
+            throws NullValueException {
         setBeerId(beerId);
-        setNom(nom);
+        setName(name);
         setPrice(price);
         setType(type);
     }
@@ -22,20 +22,20 @@ public class Beer {
     public Integer getBeerId() { return beerId; }
     public void setBeerId(Integer beerId) { this.beerId = beerId; }
 
-    public String getNom() { return nom; }
-    public void setNom(String nom) throws Nullvalueexception {
+    public String getName() { return name; }
+    public void setName(String nom) throws NullValueException {
         if (nom != null && !nom.isBlank())
-            this.nom = nom;
+            this.name = name;
         else
-            throw new Nullvalueexception("Le nom de la bière ne peut pas être vide");
+            throw new NullValueException("Le nom de la bière ne peut pas être vide");
     }
 
     public Double getPrice() { return price; }
-    public void setPrice(Double price) throws Nullvalueexception {
+    public void setPrice(Double price) throws NullValueException {
         if (price != null && price >= 0.0)
             this.price = price;
         else
-            throw new Nullvalueexception("Le prix doit être positif ou nul");
+            throw new NullValueException("Le prix doit être positif ou nul");
     }
 
     public String getType() { return type; }
@@ -45,6 +45,6 @@ public class Beer {
 
     @Override
     public String toString() {
-        return nom + " (" + type + ") – " + price + " €";
+        return name + " (" + type + ") – " + price + " €";
     }
 }

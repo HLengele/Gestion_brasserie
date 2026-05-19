@@ -1,94 +1,125 @@
 package business;
 
-import exception.ReadException;
-import model.Order;
+import dataAccess.*;
+import exception.*;
+import model.*;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 
 public class OrderManager {
-    private OrderDataAccess orderDBAccess;
-    private UserDataAccess userDBAccess;
-    private StatusDataAccess statusDBAccess;
-    private AddressDBAccess addressDBAccess;
-    private SearchDatesDBAccess searchDatesDBAccess;
 
+    // ── Déclarations des Data Access Objects (Interfaces) ──────────────────────
+    private OrderDataAccess orderDao;
+    private BeerDataAccess beerDao;
+    private CityDataAccess cityDao;
+    private EmployeeDataAccess employeeDao;
+    private TableDataAccess tableDao;
+
+    // ── Constructeur ───────────────────────────────────────────────────────────
     public OrderManager() {
-        setOrderDBAccess(new OrderDBAccess());
-        setUserDBAccess(new UserDBAccess());
-        setStatusDBAccess(new StatusDBAccess());
-        setAddressDBAccess(new AddressDBAccess());
-        setSearchDatesDBAccess(new SearchDatesDBAccess());
+        // Initialisation de tous les accès à la base de données
+        setOrderDao(new OrderDBAccess());
+        setBeerDao(new BeerDBAccess());
+        setCityDao(new CityDBAccess());
+        setEmployeeDao(new EmployeeDBAccess());
+        setTableDao(new TableDBAccess());
     }
 
-    public void setOrderDBAccess(OrderDataAccess orderDBAccess) {
-        this.orderDBAccess = orderDBAccess;
+    // ── Setters pour l'injection/modification des DAOs ────────────────────────
+    public void setOrderDao(OrderDataAccess orderDao) {
+        this.orderDao = orderDao;
     }
 
-    public void setUserDBAccess(UserDataAccess userDBAccess) {
-        this.userDBAccess = userDBAccess;
+    public void setBeerDao(BeerDataAccess beerDao) {
+        this.beerDao = beerDao;
     }
 
-    public void setStatusDBAccess(StatusDataAccess statusDBAccess) {
-        this.statusDBAccess = statusDBAccess;
+    public void setCityDao(CityDataAccess cityDao) {
+        this.cityDao = cityDao;
     }
 
-    public void setAddressDBAccess(AddressDBAccess addressDBAccess) {
-        this.addressDBAccess = addressDBAccess;
+    public void setEmployeeDao(EmployeeDataAccess employeeDao) {
+        this.employeeDao = employeeDao;
     }
 
-    public void setSearchDatesDBAccess(SearchDatesDBAccess searchDatesDBAccess) {
-        this.searchDatesDBAccess = searchDatesDBAccess;
+    public void setTableDao(TableDataAccess tableDao) {
+        this.tableDao = tableDao;
     }
 
-    public ArrayList<Order> getAllOrders() throws ReadException, NoteLengthException, NullValueException, InvalidDatesException {
-        return orderDBAccess.readAll();
+    // ── Méthodes concernant les COMMANDES (Order) ──────────────────────────────
+
+    public ArrayList<Order> getAllOrders() throws ReadException {
+        return orderDao.readAll();
     }
 
-    public User getUserById(int id) throws ReadException {
-        return userDBAccess.readById(id);
-    }
-
-    public Status getStatusById(int id) throws ReadException {
-        return statusDBAccess.readById(id);
-    }
-
-    public Address getAddressById(int id) throws ReadException {
-        return addressDBAccess.readById(id);
-    }
-
-    public ArrayList<SearchModel> searchByDates(GregorianCalendar startDate, GregorianCalendar endDate) throws SearchException, InvalidDatesException {
-        if (startDate.compareTo(endDate) > 0) {
-            throw new InvalidDatesException("startDate must be before endDate");
-        }
-        return searchDatesDBAccess.searchByDates(startDate, endDate);
-    }
-
-    public ArrayList<Status> getAllStatus() throws ReadException {
-        return statusDBAccess.readAll();
-    }
-
-    public ArrayList<Address> getAllAddresses() throws ReadException {
-        return addressDBAccess.readAll();
-    }
-
-    public ArrayList<User> getAllUsers() throws ReadException {
-        return userDBAccess.readAll();
+    public Order getOrderById(int id) throws ReadException {
+        return orderDao.readById(id);
     }
 
     public void addOrder(Order newOrder) throws AddOrderException {
-        orderDBAccess.insertOrder(newOrder);
-    }
-
-    public void deleteOrder(Integer id) throws DeleteOrderException {
-        orderDBAccess.deleteOrder(id);
-    }
-
-    public Order getOrderById(int id) throws ReadException, NoteLengthException, NullValueException, InvalidDatesException {
-        return orderDBAccess.readById(id);
+        orderDao.insertOrder(newOrder);
     }
 
     public void updateOrder(Order orderToUpdate) throws UpdateOrderException {
-        orderDBAccess.updateOrder(orderToUpdate);
+        orderDao.updateOrder(orderToUpdate);
+    }
+
+    public void deleteOrder(int orderID) throws DeleteOrderException {
+        orderDao.deleteOrder(orderID);
+    }
+
+    // ── Méthodes concernant les BIÈRES (Beer) ──────────────────────────────────
+
+    public ArrayList<Beer> getAllBeers() throws ReadException {
+        return beerDao.readAll();
+    }
+
+    public Beer getBeerById(int id) throws ReadException {
+        return beerDao.readById(id);
+    }
+
+    // ── Méthodes concernant les VILLES (City) ──────────────────────────────────
+
+    public ArrayList<City> getAllCities() throws ReadException {
+        return cityDao.readAll();
+    }
+
+    public City getCityById(int id) throws ReadException {
+        return cityDao.readById(id);
+    }
+
+    // ── Méthodes concernant les EMPLOYÉS (Employee) ────────────────────────────
+
+    public ArrayList<Employee> getAllEmployees() throws ReadException {
+        return employeeDao.readAll();
+    }
+
+    public Employee getEmployeeById(int id) throws ReadException {
+        return employeeDao.readById(id);
+    }
+
+    // ── Méthodes concernant les TABLES (Table) ─────────────────────────────────
+
+    public ArrayList<Table> getAllTables() throws ReadException {
+        return tableDao.readAll();
+    }
+
+    public Table getTableById(int id) throws ReadException {
+        return tableDao.readById(id);
+    }
+    public double calculateTableAddition(int tableNumber) throws exception.ReadException {
+        double total = 0.0;
+
+        // Récupération de toutes les commandes via votre DAO d'accès aux données
+        ArrayList<model.Order> allOrders = orderDao.readAll();
+
+        for (model.Order order : allOrders) {
+            // Si la commande correspond à la table recherchée et n'est pas encore clôturée
+            if (order.getTableNumber() == tableNumber && !"Payée".equalsIgnoreCase(order.getStatus())) {
+                // Logique de cumul des montants à adapter selon la structure de vos prix de bières
+                // total += (calcul...)
+            }
+        }
+        return total;
     }
 }

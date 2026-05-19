@@ -1,13 +1,13 @@
 package model;
 
-import exception.Nullvalueexception;
+import exception.NullValueException;
 
 public class SpecialBeer extends Beer {
 
     private String origin;   // ex : "Belgique", "Allemagne", "Tchéquie"…
 
     public SpecialBeer(Integer beerId, String nom, Double price, String type, String origin)
-            throws Nullvalueexception {
+            throws NullValueException {
         super(beerId, nom, price, type);
         setOrigin(origin);
     }
