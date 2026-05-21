@@ -17,22 +17,20 @@ public class TakeOrderPanel extends JPanel {
     private JComboBox<Table> comboTables;
     private JComboBox<Beer> comboBeers;
     private JSpinner spinnerQuantity;
-    private JTextField txtRealPrice;
     private JButton btnValidate;
 
     public TakeOrderPanel(MainWindow parent) {
         this.parent = parent;
-        this.setLayout(new GridLayout(6, 2, 10, 10));
+        this.setLayout(new GridLayout(5, 2, 10, 10));
 
-        // 1. Initialisation des composants graphiques
+        // Initialisation des composants
         comboEmployees = new JComboBox<>();
-        comboTables = new JComboBox<>();
-        comboBeers = new JComboBox<>();
+        comboTables    = new JComboBox<>();
+        comboBeers     = new JComboBox<>();
         spinnerQuantity = new JSpinner(new SpinnerNumberModel(1, 1, 50, 1));
-        txtRealPrice = new JTextField();
-        btnValidate = new JButton("Enregistrer la commande");
+        btnValidate    = new JButton("Enregistrer la commande");
 
-        // 2. Agencement des composants
+        // Agencement
         this.add(new JLabel("Choisir l'employé :"));
         this.add(comboEmployees);
 
@@ -45,34 +43,28 @@ public class TakeOrderPanel extends JPanel {
         this.add(new JLabel("Quantité :"));
         this.add(spinnerQuantity);
 
-        this.add(new JLabel("Prix Réel (€) :"));
-        this.add(txtRealPrice);
-
-        this.add(new JLabel("")); // Case vide pour alignement
+        this.add(new JLabel("")); // case vide pour alignement
         this.add(btnValidate);
 
-        // 3. Chargement des données depuis le contrôleur
+        // Chargement des données
         loadData();
 
-        // 4. Action de validation
+        // Action bouton
         btnValidate.addActionListener(e -> performTakeOrder());
     }
 
     private void loadData() {
         try {
-            // Remplissage du JComboBox des employés
             ArrayList<Employee> employees = parent.getApplicationController().getAllEmployees();
             for (Employee emp : employees) {
                 comboEmployees.addItem(emp);
             }
 
-            // Remplissage du JComboBox des tables
             ArrayList<Table> tables = parent.getApplicationController().getAllTables();
             for (Table t : tables) {
                 comboTables.addItem(t);
             }
 
-            // Remplissage du JComboBox des bières
             ArrayList<Beer> beers = parent.getApplicationController().getAllBeers();
             for (Beer b : beers) {
                 comboBeers.addItem(b);
@@ -84,24 +76,18 @@ public class TakeOrderPanel extends JPanel {
 
     private void performTakeOrder() {
         try {
-            Employee selectedEmp = (Employee) comboEmployees.getSelectedItem();
-            Table selectedTab = (Table) comboTables.getSelectedItem();
-            Beer selectedBeer = (Beer) comboBeers.getSelectedItem();
-            int qty = (int) spinnerQuantity.getValue();
-            double realPrice = Double.parseDouble(txtRealPrice.getText().trim());
+            Employee selectedEmp  = (Employee) comboEmployees.getSelectedItem();
+            Table    selectedTab  = (Table)    comboTables.getSelectedItem();
+            Beer     selectedBeer = (Beer)     comboBeers.getSelectedItem();
+            int      qty          = (int)      spinnerQuantity.getValue();
 
             if (selectedEmp == null || selectedTab == null || selectedBeer == null) {
                 JOptionPane.showMessageDialog(parent, "Veuillez sélectionner tous les éléments.", "Attention", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            // ── CORRECTION ICI : Correspondance exacte avec votre constructeur ──
-            // 1. int orderId       -> 0
-            // 2. LocalDate date    -> LocalDate.now()
-            // 3. LocalTime hour    -> LocalTime.now()
-            // 4. String status     -> "En cours"
-            // 5. int tableNumber   -> selectedTab.getTableNumber()
-            // 6. int employeeId    -> selectedEmp.getEmployeeId()
+            double realPrice = selectedBeer.getPrice();
+
             Order newOrder = new Order(
                     0,
                     LocalDate.now(),
@@ -111,21 +97,24 @@ public class TakeOrderPanel extends JPanel {
                     selectedEmp.getEmployeeId()
             );
 
-            // Envoi de la commande principale au contrôleur (Façade)
             parent.getApplicationController().addOrder(newOrder);
 
-            JOptionPane.showMessageDialog(parent, "Commande enregistrée avec succès pour la Table n°" + selectedTab.getTableNumber(), "Succès", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(
+                    parent,
+                    "Commande enregistrée pour la Table n°" + selectedTab.getTableNumber()
+                            + "\nBière : " + selectedBeer.getName()
+                            + " x" + qty
+                            + " — Total : " + String.format("%.2f", realPrice * qty) + " €",
+                    "Succès",
+                    JOptionPane.INFORMATION_MESSAGE
+            );
 
-            // Réinitialisation des composants graphiques
-            txtRealPrice.setText("");
+            // Réinitialisation
             spinnerQuantity.setValue(1);
 
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(parent, "Le prix réel doit être un nombre valide.", "Erreur Format", JOptionPane.ERROR_MESSAGE);
         } catch (AddOrderException ex) {
-            JOptionPane.showMessageDialog(parent, "Erreur lors de l'ajout de la commande : " + ex.getMessage(), "Erreur BDD", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent, "Erreur lors de l'ajout : " + ex.getMessage(), "Erreur BDD", JOptionPane.ERROR_MESSAGE);
         } catch (exception.NullValueException ex) {
-            // Gestion de votre exception métier si une donnée obligatoire est manquante
             JOptionPane.showMessageDialog(parent, "Donnée invalide : " + ex.getMessage(), "Erreur Validation", JOptionPane.ERROR_MESSAGE);
         }
     }

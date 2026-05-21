@@ -4,6 +4,7 @@ import dataAccess.*;
 import exception.*;
 import model.*;
 
+import java.sql.*;
 import java.util.ArrayList;
 
 public class OrderManager {
@@ -17,7 +18,6 @@ public class OrderManager {
 
     // ── Constructeur ───────────────────────────────────────────────────────────
     public OrderManager() {
-        // Initialisation de tous les accès à la base de données
         setOrderDao(new OrderDBAccess());
         setBeerDao(new BeerDBAccess());
         setCityDao(new CityDBAccess());
@@ -25,101 +25,69 @@ public class OrderManager {
         setTableDao(new TableDBAccess());
     }
 
-    // ── Setters pour l'injection/modification des DAOs ────────────────────────
-    public void setOrderDao(OrderDataAccess orderDao) {
-        this.orderDao = orderDao;
-    }
+    // ── Setters ────────────────────────────────────────────────────────────────
+    public void setOrderDao(OrderDataAccess orderDao) { this.orderDao = orderDao; }
+    public void setBeerDao(BeerDataAccess beerDao) { this.beerDao = beerDao; }
+    public void setCityDao(CityDataAccess cityDao) { this.cityDao = cityDao; }
+    public void setEmployeeDao(EmployeeDataAccess employeeDao) { this.employeeDao = employeeDao; }
+    public void setTableDao(TableDataAccess tableDao) { this.tableDao = tableDao; }
 
-    public void setBeerDao(BeerDataAccess beerDao) {
-        this.beerDao = beerDao;
-    }
+    // ── Méthodes COMMANDES ─────────────────────────────────────────────────────
+    public ArrayList<Order> getAllOrders() throws ReadException { return orderDao.readAll(); }
+    public Order getOrderById(int id) throws ReadException { return orderDao.readById(id); }
+    public void addOrder(Order newOrder) throws AddOrderException { orderDao.insertOrder(newOrder); }
+    public void updateOrder(Order orderToUpdate) throws UpdateOrderException { orderDao.updateOrder(orderToUpdate); }
+    public void deleteOrder(int orderID) throws DeleteOrderException { orderDao.deleteOrder(orderID); }
 
-    public void setCityDao(CityDataAccess cityDao) {
-        this.cityDao = cityDao;
-    }
+    // ── Méthodes BIÈRES ────────────────────────────────────────────────────────
+    public ArrayList<Beer> getAllBeers() throws ReadException { return beerDao.readAll(); }
+    public Beer getBeerById(int id) throws ReadException { return beerDao.readById(id); }
 
-    public void setEmployeeDao(EmployeeDataAccess employeeDao) {
-        this.employeeDao = employeeDao;
-    }
+    // ── Méthodes VILLES ────────────────────────────────────────────────────────
+    public ArrayList<City> getAllCities() throws ReadException { return cityDao.readAll(); }
+    public City getCityById(int id) throws ReadException { return cityDao.readById(id); }
 
-    public void setTableDao(TableDataAccess tableDao) {
-        this.tableDao = tableDao;
-    }
+    // ── Méthodes EMPLOYÉS ──────────────────────────────────────────────────────
+    public ArrayList<Employee> getAllEmployees() throws ReadException { return employeeDao.readAll(); }
+    public Employee getEmployeeById(int id) throws ReadException { return employeeDao.readById(id); }
 
-    // ── Méthodes concernant les COMMANDES (Order) ──────────────────────────────
+    // ── Méthodes TABLES ────────────────────────────────────────────────────────
+    public ArrayList<Table> getAllTables() throws ReadException { return tableDao.readAll(); }
+    public Table getTableById(int id) throws ReadException { return tableDao.readById(id); }
 
-    public ArrayList<Order> getAllOrders() throws ReadException {
-        return orderDao.readAll();
-    }
-
-    public Order getOrderById(int id) throws ReadException {
-        return orderDao.readById(id);
-    }
-
-    public void addOrder(Order newOrder) throws AddOrderException {
-        orderDao.insertOrder(newOrder);
-    }
-
-    public void updateOrder(Order orderToUpdate) throws UpdateOrderException {
-        orderDao.updateOrder(orderToUpdate);
-    }
-
-    public void deleteOrder(int orderID) throws DeleteOrderException {
-        orderDao.deleteOrder(orderID);
-    }
-
-    // ── Méthodes concernant les BIÈRES (Beer) ──────────────────────────────────
-
-    public ArrayList<Beer> getAllBeers() throws ReadException {
-        return beerDao.readAll();
-    }
-
-    public Beer getBeerById(int id) throws ReadException {
-        return beerDao.readById(id);
-    }
-
-    // ── Méthodes concernant les VILLES (City) ──────────────────────────────────
-
-    public ArrayList<City> getAllCities() throws ReadException {
-        return cityDao.readAll();
-    }
-
-    public City getCityById(int id) throws ReadException {
-        return cityDao.readById(id);
-    }
-
-    // ── Méthodes concernant les EMPLOYÉS (Employee) ────────────────────────────
-
-    public ArrayList<Employee> getAllEmployees() throws ReadException {
-        return employeeDao.readAll();
-    }
-
-    public Employee getEmployeeById(int id) throws ReadException {
-        return employeeDao.readById(id);
-    }
-
-    // ── Méthodes concernant les TABLES (Table) ─────────────────────────────────
-
-    public ArrayList<Table> getAllTables() throws ReadException {
-        return tableDao.readAll();
-    }
-
-    public Table getTableById(int id) throws ReadException {
-        return tableDao.readById(id);
-    }
-    public double calculateTableAddition(int tableNumber) throws exception.ReadException {
+    // ── Calcul de l'addition d'une table ───────────────────────────────────────
+    public double calculateTableAddition(int tableNumber) throws ReadException {
         double total = 0.0;
 
-        // Récupération de toutes les commandes via votre DAO d'accès aux données
-        ArrayList<model.Order> allOrders = orderDao.readAll();
+        try {
+            Connection connection = dataAccess.SingletonConnection.getInstance();
 
-        for (model.Order order : allOrders) {
-            // Si la commande correspond à la table recherchée et n'est pas encore clôturée
-            if (order.getTableNumber() == tableNumber && !"Payée".equalsIgnoreCase(order.getStatus())) {
-                // Logique de cumul des montants à adapter selon la structure de vos prix de bières
-                // total += (calcul...)
+            // On cherche toutes les commandes non payées pour cette table
+            String sqlOrders = "SELECT orderId FROM `Order` WHERE tableNumber = ? AND status != 'Payée'";
+            PreparedStatement stmtOrders = connection.prepareStatement(sqlOrders);
+            stmtOrders.setInt(1, tableNumber);
+            ResultSet orders = stmtOrders.executeQuery();
+
+            // Pour chaque commande on additionne les lignes de commande
+            while (orders.next()) {
+                int orderId = orders.getInt("orderId");
+
+                String sqlLines = "SELECT quantity, unit_price FROM Order_Line WHERE orderId = ?";
+                PreparedStatement stmtLines = connection.prepareStatement(sqlLines);
+                stmtLines.setInt(1, orderId);
+                ResultSet lines = stmtLines.executeQuery();
+
+                while (lines.next()) {
+                    int quantity      = lines.getInt("quantity");
+                    double unit_price = lines.getDouble("unit_price");
+                    total += quantity * unit_price;
+                }
             }
+
+        } catch (SQLException e) {
+            throw new ReadException("Erreur lors du calcul de l'addition : " + e.getMessage());
         }
+
         return total;
     }
 }

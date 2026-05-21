@@ -7,7 +7,7 @@ public class Beer {
     private Integer beerId;
     private String  name;
     private Double  price;
-    private String  type;       // ex : IPA, Stout, Blonde, Trappiste…
+    private String  type;
 
     public Beer(Integer beerId, String name, Double price, String type)
             throws NullValueException {
@@ -17,15 +17,13 @@ public class Beer {
         setType(type);
     }
 
-    // ── Getters / Setters ──────────────────────────────────────────────────────
-
     public Integer getBeerId() { return beerId; }
     public void setBeerId(Integer beerId) { this.beerId = beerId; }
 
     public String getName() { return name; }
     public void setName(String nom) throws NullValueException {
         if (nom != null && !nom.isBlank())
-            this.name = name;
+            this.name = nom; // ✅ CORRECTION : était "this.name = name" (bug)
         else
             throw new NullValueException("Le nom de la bière ne peut pas être vide");
     }
@@ -40,8 +38,6 @@ public class Beer {
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
-
-    // ── toString ───────────────────────────────────────────────────────────────
 
     @Override
     public String toString() {

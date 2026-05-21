@@ -8,6 +8,6 @@
     <content url="jar://$USER_HOME$/Downloads/mysql-connector-j-9.7.0/mysql-connector-j-9.7.0.jar!/" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="mysql-connector-j-9.7.0" level="project" />
+    <orderEntry type="library" exported="" name="mysql-connector-j-9.7.0" level="project" />
   </component>
 </module>
