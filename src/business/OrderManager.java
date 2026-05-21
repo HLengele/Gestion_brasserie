@@ -39,9 +39,26 @@ public class OrderManager {
     public void updateOrder(Order orderToUpdate) throws UpdateOrderException { orderDao.updateOrder(orderToUpdate); }
     public void deleteOrder(int orderID) throws DeleteOrderException { orderDao.deleteOrder(orderID); }
 
-    // ── Méthodes BIÈRES ────────────────────────────────────────────────────────
-    public ArrayList<Beer> getAllBeers() throws ReadException { return beerDao.readAll(); }
-    public Beer getBeerById(int id) throws ReadException { return beerDao.readById(id); }
+    // ── Méthodes BIÈRES (CRUD) ──────────────────────────────────────────────────
+    public ArrayList<Beer> getAllBeers() throws ReadException {
+        return beerDao.readAll();
+    }
+
+    public Beer getBeerById(int id) throws ReadException {
+        return beerDao.readById(id);
+    }
+
+    public void addBeer(Beer beer) throws Exception {
+        beerDao.insertBeer(beer);
+    }
+
+    public void updateBeer(Beer beer) throws Exception {
+        beerDao.updateBeer(beer);
+    }
+
+    public void deleteBeer(int beerId) throws Exception {
+        beerDao.deleteBeer(beerId);
+    }
 
     // ── Méthodes VILLES ────────────────────────────────────────────────────────
     public ArrayList<City> getAllCities() throws ReadException { return cityDao.readAll(); }
@@ -58,36 +75,35 @@ public class OrderManager {
     // ── Calcul de l'addition d'une table ───────────────────────────────────────
     public double calculateTableAddition(int tableNumber) throws ReadException {
         double total = 0.0;
-
         try {
             Connection connection = dataAccess.SingletonConnection.getInstance();
 
-            // On cherche toutes les commandes non payées pour cette table
-            String sqlOrders = "SELECT orderId FROM `Order` WHERE tableNumber = ? AND status != 'Payée'";
+            // Requête ajustée : On sélectionne les identifiants de commande pour la table
+            String sqlOrders = "SELECT orderId FROM `Order` WHERE tableNumber = ?";
             PreparedStatement stmtOrders = connection.prepareStatement(sqlOrders);
             stmtOrders.setInt(1, tableNumber);
             ResultSet orders = stmtOrders.executeQuery();
 
-            // Pour chaque commande on additionne les lignes de commande
             while (orders.next()) {
                 int orderId = orders.getInt("orderId");
 
-                String sqlLines = "SELECT quantity, unit_price FROM Order_Line WHERE orderId = ?";
+                // Requête ajustée : Table 'Line_Order' et colonne 'realPrice' conformes au script SQL
+                String sqlLines = "SELECT quantity, realPrice FROM Line_Order WHERE orderId = ?";
                 PreparedStatement stmtLines = connection.prepareStatement(sqlLines);
                 stmtLines.setInt(1, orderId);
                 ResultSet lines = stmtLines.executeQuery();
 
                 while (lines.next()) {
-                    int quantity      = lines.getInt("quantity");
-                    double unit_price = lines.getDouble("unit_price");
-                    total += quantity * unit_price;
+                    int quantity     = lines.getInt("quantity");
+                    double realPrice = lines.getDouble("realPrice");
+                    total += quantity * realPrice;
                 }
             }
-
         } catch (SQLException e) {
             throw new ReadException("Erreur lors du calcul de l'addition : " + e.getMessage());
         }
 
         return total;
     }
+
 }

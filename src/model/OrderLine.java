@@ -2,7 +2,7 @@ package model;
 
 import exception.NullValueException;
 
-public class CommandLine {
+public class OrderLine {
 
     private Integer quantite;
     private Double realPrice; // Provient du schéma relationnel (prix au moment de la commande)
@@ -12,7 +12,7 @@ public class CommandLine {
     // Si vous chargez l'objet Beer pour le calcul business :
     private Beer beer;
 
-    public CommandLine(Integer quantite, Double realPrice, Integer orderId, Integer beerId) throws NullValueException {
+    public OrderLine(Integer quantite, Double realPrice, Integer orderId, Integer beerId) throws NullValueException {
         setQuantite(quantite);
         setRealPrice(realPrice);
         setOrderId(orderId);

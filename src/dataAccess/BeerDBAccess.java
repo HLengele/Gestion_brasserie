@@ -4,71 +4,138 @@ import exception.ReadException;
 import model.Beer;
 import java.sql.*;
 import java.util.ArrayList;
+import java.time.LocalDate;
 
 public class BeerDBAccess implements BeerDataAccess {
 
-    // ── MÉTHODE 1 : Lire toutes les bières ──────────────────────────────────────
     @Override
-    public ArrayList<Beer> readAll() throws ReadException {
-        try {
-            Connection connection = SingletonConnection.getInstance();
-            ArrayList<Beer> beers = new ArrayList<>();
-            Beer beer = null;
+    public void insertBeer(Beer beer) throws Exception {
+        String sql = "INSERT INTO Beer (name, color, price, description, containsAlcool, marketLaunchDate, comment, categoryId) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            String sql = "SELECT * FROM Beer ORDER BY beerId";
+            statement.setString(1, beer.getName());
+            statement.setString(2, beer.getColor());
+            statement.setDouble(3, beer.getPrice());
+            statement.setString(4, beer.getDescription());
+            statement.setBoolean(5, beer.getContainsAlcool() != null ? beer.getContainsAlcool() : true);
+            statement.setDate(6, beer.getMarketLaunchDate() != null ? Date.valueOf(beer.getMarketLaunchDate()) : null);
+            statement.setString(7, beer.getComment());
 
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet data = statement.executeQuery();
+            if (beer.getCategoryId() != null) statement.setInt(8, beer.getCategoryId());
+            else statement.setNull(8, Types.INTEGER);
 
-            while (data.next()) {
-                beer = new Beer(
-                        data.getInt("beerId"),
-                        data.getString("name"),  // Utilisez "nom" si votre colonne s'appelle ainsi en BD
-                        data.getDouble("price"),
-                        data.getString("type")
-                );
-                beers.add(beer);
-            }
-
-            return beers;
-
-        } catch (Exception exception) {
-            throw new ReadException(exception.getMessage());
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Erreur lors de l'ajout de la bière : " + e.getMessage());
         }
     }
 
-    // ── MÉTHODE 2 : Trouver une bière par son ID (Ajoutée pour corriger l'erreur !) ──
     @Override
-    public Beer readById(int id) throws ReadException {
-        try {
-            Connection connection = SingletonConnection.getInstance();
-            Beer beer = null;
+    public ArrayList<Beer> readAll() throws ReadException {
+        ArrayList<Beer> beers = new ArrayList<>();
+        String sql = "SELECT * FROM Beer ORDER BY name";
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet data = statement.executeQuery()) {
 
-            // Utilisation d'un paramètre '?' pour éviter les injections SQL (Consigne du cours)
-            String sql = "SELECT * FROM Beer WHERE beerId = ?";
+            while (data.next()) {
+                Date sqlDate = data.getDate("marketLaunchDate");
+                LocalDate localDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-            PreparedStatement statement = connection.prepareStatement(sql);
+                Integer catId = data.getInt("categoryId");
+                if (data.wasNull()) catId = null;
 
-            // On remplace le premier '?' par la valeur de la variable 'id'
-            statement.setInt(1, id);
-
-            ResultSet data = statement.executeQuery();
-
-            // S'il y a un résultat, on instancie notre objet Beer
-            if (data.next()) {
-                beer = new Beer(
+                Beer beer = new Beer(
                         data.getInt("beerId"),
                         data.getString("name"),
+                        data.getString("color"),
                         data.getDouble("price"),
-                        data.getString("type")
+                        data.getString("description"),
+                        data.getBoolean("containsAlcool"),
+                        localDate,
+                        data.getString("comment"),
+                        catId
                 );
+                beers.add(beer);
             }
+        } catch (Exception e) {
+            throw new ReadException("Erreur de lecture des bières : " + e.getMessage());
+        }
+        return beers;
+    }
 
-            return beer;
+    @Override
+    public Beer readById(int id) throws ReadException {
+        String sql = "SELECT * FROM Beer WHERE beerId = ?";
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
-        } catch (Exception exception) {
-            // Respect de la structure du cours : conversion en ReadException
-            throw new ReadException(exception.getMessage());
+            statement.setInt(1, id);
+            try (ResultSet data = statement.executeQuery()) {
+                if (data.next()) {
+                    Date sqlDate = data.getDate("marketLaunchDate");
+                    LocalDate localDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
+
+                    Integer catId = data.getInt("categoryId");
+                    if (data.wasNull()) catId = null;
+
+                    return new Beer(
+                            data.getInt("beerId"),
+                            data.getString("name"),
+                            data.getString("color"),
+                            data.getDouble("price"),
+                            data.getString("description"),
+                            data.getBoolean("containsAlcool"),
+                            localDate,
+                            data.getString("comment"),
+                            catId
+                    );
+                }
+            }
+        } catch (Exception e) {
+            throw new ReadException("Erreur lors de la recherche de la bière : " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public void updateBeer(Beer beer) throws Exception {
+        String sql = "UPDATE Beer SET name = ?, color = ?, price = ?, description = ?, containsAlcool = ?, " +
+                "marketLaunchDate = ?, comment = ?, categoryId = ? WHERE beerId = ?";
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, beer.getName());
+            statement.setString(2, beer.getColor());
+            statement.setDouble(3, beer.getPrice());
+            statement.setString(4, beer.getDescription());
+            statement.setBoolean(5, beer.getContainsAlcool());
+            statement.setDate(6, beer.getMarketLaunchDate() != null ? Date.valueOf(beer.getMarketLaunchDate()) : null);
+            statement.setString(7, beer.getComment());
+
+            if (beer.getCategoryId() != null) statement.setInt(8, beer.getCategoryId());
+            else statement.setNull(8, Types.INTEGER);
+
+            statement.setInt(9, beer.getBeerId());
+
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Erreur lors de la modification de la bière : " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void deleteBeer(int beerId) throws Exception {
+        String sql = "DELETE FROM Beer WHERE beerId = ?";
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, beerId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Erreur lors de la suppression de la bière. Note : Vérifiez qu'elle n'est pas liée à une commande en cours. Détails : " + e.getMessage());
         }
     }
 }

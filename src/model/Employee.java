@@ -2,7 +2,6 @@ package model;
 
 import exception.NullValueException;
 import java.time.LocalDate;
-import java.util.GregorianCalendar;
 
 public class Employee {
 
@@ -15,18 +14,14 @@ public class Employee {
     // ── Relations (issues du diagramme) ────────────────────────────────────────
     private City city;
 
-    // ── Attributs spécifiques à votre logique (hors diagramme) ─────────────────
-    private Integer capacite; // ex : nombre max de tables gérées simultanément
-
     // ── Constructeur ───────────────────────────────────────────────────────────
-    public Employee(Integer employeeId, String firstName, String lastName, LocalDate hiringDate, City city, Integer capacite)
+    public Employee(Integer employeeId, String firstName, String lastName, LocalDate hiringDate, City city)
             throws NullValueException {
         setEmployeeId(employeeId);
         setFirstName(firstName);
         setLastName(lastName);
         setHiringDate(hiringDate);
         setCity(city);
-        setCapacite(capacite);
     }
 
     // ── Getters / Setters ──────────────────────────────────────────────────────
@@ -79,18 +74,11 @@ public class Employee {
         this.city = city;
     }
 
-    public Integer getCapacite() {
-        return capacite;
-    }
-
-    public void setCapacite(Integer capacite) {
-        this.capacite = capacite;
-    }
-
     // ── Méthodes métier ────────────────────────────────────────────────────────
 
     /**
      * Crée et retourne une nouvelle commande associée à une table.
+     * Adapté au nouveau schéma BD (orderId, hour, tableNumber).
      *
      * @param table  La table pour laquelle la commande est créée
      * @return       La commande créée
@@ -100,26 +88,26 @@ public class Employee {
             throw new NullValueException("Impossible de prendre une commande pour une table nulle");
         }
 
-        // Initialisation automatique avec l'ID 0 (ou géré par l'AUTO_INCREMENT de la BDD lors de l'insertion)
-        // l'identifiant de l'employé courant (this.getEmployeeId()) et le numéro de la table
+        // Initialisation automatique avec l'ID 0 (géré par l'AUTO_INCREMENT de la BDD)
+        // et uniquement avec l'heure et le numéro de table (conformément à la BDD)
         return new Order(
                 0,
-                java.time.LocalDate.now(),
                 java.time.LocalTime.now(),
-                "En cours",
-                table.getTableNumber(), // Assurez-vous que le getter de la classe Table s'appelle bien ainsi
-                this.getEmployeeId()
+                table.getTableNumber()
         );
     }
 
     /**
-     * Collecte (clôture) une commande : marque la commande comme terminée.
+     * Collecte (clôture) une commande.
+     * ATTENTION : Le champ "status" n'existant plus en BDD, cette méthode
+     * devra utiliser une autre logique si vous souhaitez conserver un historique.
      *
      * @param order  La commande à clôturer
      */
     public void collect(Order order) throws NullValueException {
         if (order != null) {
-            order.setStatus("Payée");
+            // L'instruction order.setStatus("Payée") a été retirée car elle est incompatible avec la BD.
+            // À l'avenir, vous pourriez par exemple supprimer la commande ou l'archiver dans une autre table.
         }
     }
 
@@ -127,7 +115,6 @@ public class Employee {
 
     @Override
     public String toString() {
-        // Correction : "name" n'existait pas, on concatène le prénom et le nom
         return firstName + " " + lastName;
     }
 }

@@ -1,4 +1,4 @@
-package userInterface.components;
+package userInterface.panel;
 
 import model.Table;
 import exception.ReadException;

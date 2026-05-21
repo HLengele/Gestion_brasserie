@@ -1,11 +1,13 @@
 package dataAccess;
 
-import exception.ReadException;
+import exception.*;
 import model.Beer;
 import java.util.ArrayList;
 
-// Une interface utilise le mot-clé "interface" et non "class"
 public interface BeerDataAccess {
-    ArrayList<Beer> readAll() throws ReadException;
-    Beer readById(int id) throws ReadException;
+    void insertBeer(Beer beer) throws Exception;       // CREATE
+    ArrayList<Beer> readAll() throws ReadException;    // READ ALL
+    Beer readById(int id) throws ReadException;        // READ BY ID
+    void updateBeer(Beer beer) throws Exception;       // UPDATE
+    void deleteBeer(int beerId) throws Exception;      // DELETE
 }

@@ -1,46 +1,67 @@
 package model;
 
 import exception.NullValueException;
+import java.time.LocalDate;
 
 public class Beer {
-
     private Integer beerId;
-    private String  name;
-    private Double  price;
-    private String  type;
+    private String name;
+    private String color;
+    private Double price;
+    private String description;
+    private Boolean containsAlcool;
+    private LocalDate marketLaunchDate;
+    private String comment;
+    private Integer categoryId; // Clé étrangère qui peut être nulle
 
-    public Beer(Integer beerId, String name, Double price, String type)
-            throws NullValueException {
-        setBeerId(beerId);
+    // Constructeur complet pour la lecture (avec ID)
+    public Beer(Integer beerId, String name, String color, Double price, String description,
+                Boolean containsAlcool, LocalDate marketLaunchDate, String comment, Integer categoryId) throws NullValueException {
+        this.beerId = beerId;
         setName(name);
+        this.color = color;
         setPrice(price);
-        setType(type);
+        this.description = description;
+        this.containsAlcool = containsAlcool;
+        this.marketLaunchDate = marketLaunchDate;
+        this.comment = comment;
+        this.categoryId = categoryId;
     }
 
+    // Getters et Setters avec vérifications de base
     public Integer getBeerId() { return beerId; }
     public void setBeerId(Integer beerId) { this.beerId = beerId; }
 
     public String getName() { return name; }
-    public void setName(String nom) throws NullValueException {
-        if (nom != null && !nom.isBlank())
-            this.name = nom; // ✅ CORRECTION : était "this.name = name" (bug)
-        else
-            throw new NullValueException("Le nom de la bière ne peut pas être vide");
+    public void setName(String name) throws NullValueException {
+        if (name == null || name.isBlank()) throw new NullValueException("Le nom de la bière est obligatoire.");
+        this.name = name;
     }
+
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) throws NullValueException {
-        if (price != null && price >= 0.0)
-            this.price = price;
-        else
-            throw new NullValueException("Le prix doit être positif ou nul");
+        if (price == null || price < 0) throw new NullValueException("Le prix doit être positif.");
+        this.price = price;
     }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public Boolean getContainsAlcool() { return containsAlcool; }
+    public void setContainsAlcool(Boolean containsAlcool) { this.containsAlcool = containsAlcool; }
+
+    public LocalDate getMarketLaunchDate() { return marketLaunchDate; }
+    public void setMarketLaunchDate(LocalDate marketLaunchDate) { this.marketLaunchDate = marketLaunchDate; }
+
+    public String getComment() { return comment; }
+    public void setComment(String comment) { this.comment = comment; }
+
+    public Integer getCategoryId() { return categoryId; }
+    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 
     @Override
-    public String toString() {
-        return name + " (" + type + ") – " + price + " €";
-    }
+    public String toString() { return name + " (" + color + ") - " + price + "€"; }
 }

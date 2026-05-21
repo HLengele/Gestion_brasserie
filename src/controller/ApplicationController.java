@@ -87,4 +87,15 @@ public class ApplicationController {
         // Le contrôleur délègue directement le calcul à son manager interne
         return orderManager.calculateTableAddition(tableNumber);
     }
+    public void addBeer(Beer beer) throws Exception {
+        orderManager.addBeer(beer);
+    }
+
+    public void updateBeer(Beer beer) throws Exception {
+        orderManager.updateBeer(beer);
+    }
+
+    public void deleteBeer(int beerId) throws Exception {
+        orderManager.deleteBeer(beerId);
+    }
 }

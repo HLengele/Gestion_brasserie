@@ -2,7 +2,7 @@ package dataAccess;
 
 import exception.ReadException;
 import model.Employee;
-import model.City; // Ne pas oublier l'import
+import model.City;
 import java.sql.*;
 import java.util.ArrayList;
 import java.time.LocalDate;
@@ -15,36 +15,33 @@ public class EmployeeDBAccess implements EmployeeDataAccess {
             Connection connection = SingletonConnection.getInstance();
             ArrayList<Employee> employees = new ArrayList<>();
 
-            // On sélectionne aussi la clé étrangère (ex: cityId) si elle est dans la table
             String sql = "SELECT * FROM Employee ORDER BY employeeId";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet data = statement.executeQuery();
 
             while(data.next()) {
-                // 1. Conversion de la date
+                // 1. Conversion de la date d'embauche
                 Date sqlDate = data.getDate("hiringDate");
                 LocalDate localHiringDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                // 2. Récupération de la ville (Idéalement via votre CityDBAccess)
+                // 2. Récupération de la ville (Initialisé à null)
+                // Si vous liez plus tard avec CityDBAccess, vous pourrez faire :
                 // int cityId = data.getInt("cityId");
-                // City city = cityDBAccess.readById(cityId);
-                City city = null; // À remplacer par un vrai objet City si vous l'avez déjà implémenté
+                // City city = new CityDBAccess().readById(cityId);
+                City city = null;
 
-                // 3. Récupération de la capacité (si elle est en BDD, sinon mettez une valeur par défaut)
-                int capacite = data.getInt("capacite");
-
+                // 3. Instanciation de l'employé (sans le paramètre capacite)
                 Employee employee = new Employee(
                         data.getInt("employeeId"),
-                        data.getString("firstName"), // Remis dans le bon ordre
+                        data.getString("firstName"),
                         data.getString("lastName"),
                         localHiringDate,
-                        city,
-                        capacite
+                        city
                 );
                 employees.add(employee);
             }
             return employees;
-        } catch (Exception exception) { // Changé en Exception pour capturer NullValueException
+        } catch (Exception exception) {
             throw new ReadException(exception.getMessage());
         }
     }
@@ -61,20 +58,20 @@ public class EmployeeDBAccess implements EmployeeDataAccess {
             ResultSet data = statement.executeQuery();
 
             if (data.next()) {
+                // 1. Conversion de la date d'embauche
                 Date sqlDate = data.getDate("hiringDate");
                 LocalDate localHiringDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                // Idem ici pour city et capacite
+                // 2. Récupération de la ville (Initialisé à null)
                 City city = null;
-                int capacite = data.getInt("capacite");
 
+                // 3. Instanciation de l'employé (sans le paramètre capacite ni la lecture de colonne obsolète)
                 employee = new Employee(
                         data.getInt("employeeId"),
                         data.getString("firstName"),
                         data.getString("lastName"),
                         localHiringDate,
-                        city,
-                        capacite
+                        city
                 );
             }
             return employee;

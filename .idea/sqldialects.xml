@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$USER_HOME$/Downloads/BD_Brasserie-2.sql" dialect="MySQL" />
-    <file url="file://$USER_HOME$/Downloads/BD_Brasserie.sql" dialect="MySQL" />
+    <file url="file://$USER_HOME$/Downloads/BD_Brasserie-Final.sql" dialect="MySQL" />
     <file url="file://$USER_HOME$/Downloads/brasserie_db.sql" dialect="GenericSQL" />
   </component>
 </project>
