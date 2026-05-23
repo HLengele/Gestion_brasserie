@@ -4,18 +4,18 @@ import exception.NullValueException;
 import java.time.LocalTime;
 
 public class Order {
-    private int orderId;
+    private Integer orderId;
     private LocalTime hour;
     private int tableNumber;
 
-    public Order(int orderId, LocalTime hour, int tableNumber) throws NullValueException {
+    public Order(Integer orderId, LocalTime hour, int tableNumber) throws NullValueException {
         setOrderId(orderId);
         setHour(hour);
         setTableNumber(tableNumber);
     }
 
-    public int getOrderId() { return orderId; }
-    public void setOrderId(int orderId) { this.orderId = orderId; }
+    public Integer getOrderId() { return orderId; }
+    public void setOrderId(Integer orderId) { this.orderId = orderId; }
 
     public LocalTime getHour() { return hour; }
     public void setHour(LocalTime hour) throws NullValueException {

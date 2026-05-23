@@ -11,7 +11,6 @@ public class OrderManager {
 
     // ── Déclarations des Data Access Objects (Interfaces) ──────────────────────
     private OrderDataAccess orderDao;
-    private BeerDataAccess beerDao;
     private CityDataAccess cityDao;
     private EmployeeDataAccess employeeDao;
     private TableDataAccess tableDao;
@@ -19,7 +18,6 @@ public class OrderManager {
     // ── Constructeur ───────────────────────────────────────────────────────────
     public OrderManager() {
         setOrderDao(new OrderDBAccess());
-        setBeerDao(new BeerDBAccess());
         setCityDao(new CityDBAccess());
         setEmployeeDao(new EmployeeDBAccess());
         setTableDao(new TableDBAccess());
@@ -27,7 +25,6 @@ public class OrderManager {
 
     // ── Setters ────────────────────────────────────────────────────────────────
     public void setOrderDao(OrderDataAccess orderDao) { this.orderDao = orderDao; }
-    public void setBeerDao(BeerDataAccess beerDao) { this.beerDao = beerDao; }
     public void setCityDao(CityDataAccess cityDao) { this.cityDao = cityDao; }
     public void setEmployeeDao(EmployeeDataAccess employeeDao) { this.employeeDao = employeeDao; }
     public void setTableDao(TableDataAccess tableDao) { this.tableDao = tableDao; }
@@ -35,30 +32,8 @@ public class OrderManager {
     // ── Méthodes COMMANDES ─────────────────────────────────────────────────────
     public ArrayList<Order> getAllOrders() throws ReadException { return orderDao.readAll(); }
     public Order getOrderById(int id) throws ReadException { return orderDao.readById(id); }
-    public void addOrder(Order newOrder) throws AddOrderException { orderDao.insertOrder(newOrder); }
     public void updateOrder(Order orderToUpdate) throws UpdateOrderException { orderDao.updateOrder(orderToUpdate); }
     public void deleteOrder(int orderID) throws DeleteOrderException { orderDao.deleteOrder(orderID); }
-
-    // ── Méthodes BIÈRES (CRUD) ──────────────────────────────────────────────────
-    public ArrayList<Beer> getAllBeers() throws ReadException {
-        return beerDao.readAll();
-    }
-
-    public Beer getBeerById(int id) throws ReadException {
-        return beerDao.readById(id);
-    }
-
-    public void addBeer(Beer beer) throws Exception {
-        beerDao.insertBeer(beer);
-    }
-
-    public void updateBeer(Beer beer) throws Exception {
-        beerDao.updateBeer(beer);
-    }
-
-    public void deleteBeer(int beerId) throws Exception {
-        beerDao.deleteBeer(beerId);
-    }
 
     // ── Méthodes VILLES ────────────────────────────────────────────────────────
     public ArrayList<City> getAllCities() throws ReadException { return cityDao.readAll(); }
@@ -78,7 +53,6 @@ public class OrderManager {
         try {
             Connection connection = dataAccess.SingletonConnection.getInstance();
 
-            // Requête ajustée : On sélectionne les identifiants de commande pour la table
             String sqlOrders = "SELECT orderId FROM `Order` WHERE tableNumber = ?";
             PreparedStatement stmtOrders = connection.prepareStatement(sqlOrders);
             stmtOrders.setInt(1, tableNumber);
@@ -87,7 +61,6 @@ public class OrderManager {
             while (orders.next()) {
                 int orderId = orders.getInt("orderId");
 
-                // Requête ajustée : Table 'Line_Order' et colonne 'realPrice' conformes au script SQL
                 String sqlLines = "SELECT quantity, realPrice FROM Line_Order WHERE orderId = ?";
                 PreparedStatement stmtLines = connection.prepareStatement(sqlLines);
                 stmtLines.setInt(1, orderId);
@@ -105,5 +78,13 @@ public class OrderManager {
 
         return total;
     }
+    // Modifier addOrder pour qu'il retourne le int
+    public int addOrder(Order newOrder) throws AddOrderException {
+        return orderDao.insertOrder(newOrder);
+    }
 
+    // Ajouter la méthode pour la ligne
+    public void addLineOrder(int orderId, int beerId, int quantity, double realPrice) throws Exception {
+        orderDao.insertLineOrder(orderId, beerId, quantity, realPrice);
+    }
 }

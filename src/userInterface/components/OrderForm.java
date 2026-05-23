@@ -2,77 +2,95 @@ package userInterface.components;
 
 import exception.NullValueException;
 import model.Order;
+
 import javax.swing.*;
 import java.awt.*;
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 public class OrderForm extends JPanel {
 
-    private JTextField txtDate, txtHour, txtStatus, txtTableNumber, txtEmployeeId;
-    // Remplacement d'Integer par int (0 signifie "aucune commande sélectionnée")
-    private int currentOrderId = 0;
+    private JTextField txtOrderId;
+    private JTextField txtHour;
+    private JSpinner   spinnerTableNumber;
+
+    private Integer currentOrderId = null; // Permet de savoir si on édite ou si on crée
 
     public OrderForm() {
-        this.setLayout(new GridLayout(5, 2, 10, 10));
+        // Disposition en grille : 3 lignes, 2 colonnes, espacement de 10px
+        this.setLayout(new GridLayout(3, 2, 10, 10));
 
-        this.add(new JLabel("Date (AAAA-MM-JJ) :"));
-        txtDate = new JTextField();
-        this.add(txtDate);
+        // 1. Initialisation des composants
+        txtOrderId = new JTextField();
+        txtOrderId.setEditable(false); // L'ID est géré par la BD, donc non modifiable
+        txtOrderId.setBackground(Color.LIGHT_GRAY);
 
-        this.add(new JLabel("Heure (HH:MM:SS) :"));
         txtHour = new JTextField();
+        txtHour.setToolTipText("Format HH:mm:ss (ex: 14:30:00)");
+
+        // Spinner pour le numéro de table (de 1 à 100, pas par pas de 1)
+        spinnerTableNumber = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+
+        // 2. Ajout des composants au panneau avec leurs labels
+        this.add(new JLabel("ID Commande (Auto) :"));
+        this.add(txtOrderId);
+
+        this.add(new JLabel("Heures (HH:mm:ss) :"));
         this.add(txtHour);
 
-        this.add(new JLabel("Statut :"));
-        txtStatus = new JTextField();
-        this.add(txtStatus);
-
         this.add(new JLabel("Numéro de Table :"));
-        txtTableNumber = new JTextField();
-        this.add(txtTableNumber);
+        this.add(spinnerTableNumber);
 
-        this.add(new JLabel("ID Employé :"));
-        txtEmployeeId = new JTextField();
-        this.add(txtEmployeeId);
+        // Par défaut, on initialise le formulaire à vide
+        orderToForm(null);
     }
 
-    // Retourne un int primitif
-    public int getCurrentOrderId() {
+    /**
+     * Remplit le formulaire avec les données d'une commande.
+     * Si le paramètre est 'null', le formulaire est vidé (mode création).
+     */
+    public void orderToForm(Order order) {
+        if (order == null) {
+            currentOrderId = null;
+            txtOrderId.setText("");
+            // On pré-remplit automatiquement avec l'heure actuelle pour aider l'utilisateur
+            txtHour.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            spinnerTableNumber.setValue(1);
+        } else {
+            currentOrderId = order.getOrderId();
+            txtOrderId.setText(String.valueOf(order.getOrderId()));
+            txtHour.setText(order.getHour().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+            spinnerTableNumber.setValue(order.getTableNumber());
+        }
+    }
+
+    /**
+     * Récupère les données saisies dans le formulaire pour créer/mettre à jour un objet Order.
+     */
+    public Order formToOrder() throws NullValueException, IllegalArgumentException {
+        // Validation du format de l'heure
+        LocalTime hour;
+        try {
+            hour = LocalTime.parse(txtHour.getText().trim());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Le format de l'heure est incorrect (HH:mm:ss requis).");
+        }
+
+        int tableNumber = (int) spinnerTableNumber.getValue();
+
+        // Si currentOrderId est null, c'est une nouvelle commande (on met l'ID à 0)
+        int id = (currentOrderId == null) ? 0 : currentOrderId;
+
+        // Instanciation de votre modèle Order mis à jour (3 paramètres)
+        return new Order(id, hour, tableNumber);
+    }
+
+    // Getter et Setter pour l'ID de la commande en cours
+    public Integer getCurrentOrderId() {
         return currentOrderId;
     }
 
-    // Reçoit un int primitif
-    public void setCurrentOrderId(int id) {
-        this.currentOrderId = id;
-    }
-
-    public void orderToForm(Order order) {
-        this.currentOrderId = order.getOrderId();
-        this.txtDate.setText(order.getOrderDate().toString());
-        this.txtHour.setText(order.getHour().toString());
-        this.txtStatus.setText(order.getStatus());
-        this.txtTableNumber.setText(String.valueOf(order.getTableNumber()));
-        this.txtEmployeeId.setText(String.valueOf(order.getEmployeeId()));
-    }
-
-    public Order formToOrder() throws NullValueException, NumberFormatException {
-        LocalDate date = LocalDate.parse(txtDate.getText().trim());
-        LocalTime hour = LocalTime.parse(txtHour.getText().trim());
-        String status = txtStatus.getText().trim();
-        int tableNum = Integer.parseInt(txtTableNumber.getText().trim());
-        int empId = Integer.parseInt(txtEmployeeId.getText().trim());
-
-        // currentOrderId est directement un int primitif
-        return new Order(currentOrderId, date, hour, status, tableNum, empId);
-    }
-
-    public void clearForm() {
-        this.currentOrderId = 0; // Réinitialisation à 0
-        this.txtDate.setText("");
-        this.txtHour.setText("");
-        this.txtStatus.setText("");
-        this.txtTableNumber.setText("");
-        this.txtEmployeeId.setText("");
+    public void setCurrentOrderId(Integer currentOrderId) {
+        this.currentOrderId = currentOrderId;
     }
 }

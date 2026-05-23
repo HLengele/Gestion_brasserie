@@ -1,79 +1,173 @@
-package userInterface.panel; // Ou le nom de votre package graphique (ex: gui, userInterface)
+package userInterface.panel;
 
 import model.Beer;
+import model.Category;
+
 import javax.swing.*;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 
-public class BeerFormPanel extends JPanel { // Ou extends JFrame selon votre structure
+public class BeerFormPanel extends JPanel {
 
-    // 1. Vos composants graphiques existants (JTextField, JLabel, etc.)
-    private JTextField txtName, txtColor, txtPrice, txtDescription, txtComment, txtMarketLaunchDate, txtCategoryId;
-    private JButton btnSave, btnCancel;
+    private JTextField txtId;
+    private JTextField txtName;
+    private JTextField txtColor;
+    private JTextField txtPrice;
+    private JCheckBox chkAlcohol;
+    private JTextField txtLaunchDate;
+    private JTextField txtDescription;
+    private JTextField txtComment;
+    private JComboBox<String> comboCategory;
 
-    // 2. PLACEZ LA NOUVELLE VARIABLE ICI (au niveau des attributs de la classe)
-    private Integer currentBeerId;
-
-    // 3. Votre constructeur (où vous initialisez et placez vos composants)
     public BeerFormPanel() {
-        // Code d'initialisation de l'interface (setLayout, add(txtName), etc.)
-        // ...
+        this.setLayout(new GridLayout(9, 2, 10, 10));
+        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        this.add(new JLabel("ID :"));
+        txtId = new JTextField();
+        txtId.setEditable(false);
+        this.add(txtId);
+
+        this.add(new JLabel("Nom :"));
+        txtName = new JTextField();
+        this.add(txtName);
+
+        this.add(new JLabel("Couleur :"));
+        txtColor = new JTextField();
+        this.add(txtColor);
+
+        this.add(new JLabel("Prix (€) :"));
+        txtPrice = new JTextField();
+        this.add(txtPrice);
+
+        this.add(new JLabel("Contient de l'alcool :"));
+        chkAlcohol = new JCheckBox("Oui");
+        this.add(chkAlcohol);
+
+        this.add(new JLabel("Date Lancement (YYYY-MM-DD) :"));
+        txtLaunchDate = new JTextField();
+        this.add(txtLaunchDate);
+
+        this.add(new JLabel("Description :"));
+        txtDescription = new JTextField();
+        this.add(txtDescription);
+
+        this.add(new JLabel("Commentaire :"));
+        txtComment = new JTextField();
+        this.add(txtComment);
+
+        this.add(new JLabel("Catégorie :"));
+        comboCategory = new JComboBox<>();
+        comboCategory.addItem("-- Sélectionner une catégorie --");
+        this.add(comboCategory);
     }
-    public Integer getCurrentBeerId() {
-        return currentBeerId;
-    }
 
-    public void setCurrentBeerId(Integer id) {
-        this.currentBeerId = id;
-    }
-
-    // 4. INSÉREZ LA MÉTHODE ICI (à la place de l'ancienne méthode orderToForm)
-    public void beerToForm(Beer beer) {
-        this.currentBeerId = beer.getBeerId();
-
-        this.txtName.setText(beer.getName());
-        this.txtColor.setText(beer.getColor());
-        this.txtPrice.setText(String.valueOf(beer.getPrice()));
-        this.txtDescription.setText(beer.getDescription());
-        this.txtComment.setText(beer.getComment());
-
-        if (beer.getMarketLaunchDate() != null) {
-            this.txtMarketLaunchDate.setText(beer.getMarketLaunchDate().toString());
-        } else {
-            this.txtMarketLaunchDate.setText("");
+    public void populateCategories(ArrayList<Category> categories) {
+        comboCategory.removeAllItems();
+        comboCategory.addItem("-- Sélectionner une catégorie --");
+        if (categories != null) {
+            for (Category cat : categories) {
+                comboCategory.addItem(cat.getName() + " (" + cat.getCategoryId() + ")");
+            }
         }
-
-        if (beer.getCategoryId() != null) {
-            this.txtCategoryId.setText(String.valueOf(beer.getCategoryId()));
-        } else {
-            this.txtCategoryId.setText("");
-        }
     }
 
-    // 5. AJOUTEZ ÉGALEMENT LA MÉTHODE INVERSE ICI
+    /**
+     * Extrait les données du formulaire en respectant l'ordre exact du modèle Beer.
+     */
     public Beer formToBeer() throws Exception {
-        String name = this.txtName.getText().trim();
-        String color = this.txtColor.getText().trim();
-
-        double price;
-        try {
-            price = Double.parseDouble(this.txtPrice.getText().trim());
-        } catch (NumberFormatException e) {
-            throw new Exception("Le prix doit être un nombre valide.");
+        Integer id = null;
+        if (!txtId.getText().trim().isEmpty()) {
+            id = Integer.parseInt(txtId.getText().trim());
         }
 
-        String description = this.txtDescription.getText().trim();
-        String comment = this.txtComment.getText().trim();
+        String name = txtName.getText().trim();
+        String color = txtColor.getText().trim();
+        String description = txtDescription.getText().trim().isEmpty() ? null : txtDescription.getText().trim();
+        String comment = txtComment.getText().trim().isEmpty() ? null : txtComment.getText().trim();
 
-        java.time.LocalDate launchDate = null;
-        if (!this.txtMarketLaunchDate.getText().isBlank()) {
-            launchDate = java.time.LocalDate.parse(this.txtMarketLaunchDate.getText().trim());
+        Double price = null;
+        try {
+            price = Double.parseDouble(txtPrice.getText().trim().replace(",", "."));
+        } catch (NumberFormatException e) {
+            throw new Exception("Le format du prix est invalide.");
+        }
+
+        Boolean containsAlcool = chkAlcohol.isSelected();
+
+        LocalDate launchDate = null;
+        String dateTxt = txtLaunchDate.getText().trim();
+        if (!dateTxt.isEmpty()) {
+            try {
+                launchDate = LocalDate.parse(dateTxt);
+            } catch (DateTimeParseException ex) {
+                throw new Exception("Le format de la date est incorrect. Utilisez YYYY-MM-DD.");
+            }
         }
 
         Integer categoryId = null;
-        if (!this.txtCategoryId.getText().isBlank()) {
-            categoryId = Integer.parseInt(this.txtCategoryId.getText().trim());
+        String selectedCat = (String) comboCategory.getSelectedItem();
+        if (selectedCat != null && !selectedCat.startsWith("--")) {
+            int openParen = selectedCat.lastIndexOf("(");
+            int closeParen = selectedCat.lastIndexOf(")");
+            if (openParen != -1 && closeParen != -1) {
+                categoryId = Integer.parseInt(selectedCat.substring(openParen + 1, closeParen));
+            }
         }
 
-        // On réutilise la variable currentBeerId stockée lors du chargement
-        return new Beer(this.currentBeerId, name, color, price, description, true, launchDate, comment, categoryId);
+        // CORRECTION DE L'INVERSION ICI : 'name' passe avant 'color'
+        Beer beer = new Beer(id, name, color, price, description, containsAlcool, launchDate, comment, categoryId);
+
+        return beer;
+    }
+
+    /**
+     * Remplit le formulaire lors d'un clic sur le tableau
+     */
+    public void beerToForm(Beer beer) {
+        if (beer == null) {
+            txtId.setText("");
+            txtName.setText("");
+            txtColor.setText("");
+            txtPrice.setText("");
+            chkAlcohol.setSelected(false);
+            txtLaunchDate.setText("");
+            txtDescription.setText("");
+            txtComment.setText("");
+            comboCategory.setSelectedIndex(0);
+            return;
+        }
+
+        txtId.setText(beer.getBeerId() != null ? String.valueOf(beer.getBeerId()) : "");
+        txtName.setText(beer.getName() != null ? beer.getName() : "");
+        txtColor.setText(beer.getColor() != null ? beer.getColor() : "");
+        txtPrice.setText(beer.getPrice() != null ? String.valueOf(beer.getPrice()) : "");
+        chkAlcohol.setSelected(beer.getContainsAlcool() != null && beer.getContainsAlcool());
+        txtLaunchDate.setText(beer.getMarketLaunchDate() != null ? beer.getMarketLaunchDate().toString() : "");
+        txtDescription.setText(beer.getDescription() != null ? beer.getDescription() : "");
+        txtComment.setText(beer.getComment() != null ? beer.getComment() : "");
+
+        Integer targetCatId = beer.getCategoryId();
+        if (targetCatId != null && targetCatId != 0) {
+            for (int i = 0; i < comboCategory.getItemCount(); i++) {
+                String item = comboCategory.getItemAt(i);
+                if (item.endsWith("(" + targetCatId + ")")) {
+                    comboCategory.setSelectedIndex(i);
+                    break;
+                }
+            }
+        } else {
+            comboCategory.setSelectedIndex(0);
+        }
+    }
+
+    public void setCurrentBeerId(Integer id) {
+        if (id == null) {
+            txtId.setText("");
+        } else {
+            txtId.setText(String.valueOf(id));
+        }
     }
 }

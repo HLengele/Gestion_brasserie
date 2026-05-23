@@ -13,7 +13,7 @@ public class TableDBAccess implements TableDataAccess {
             Connection connection = SingletonConnection.getInstance();
             ArrayList<Table> tables = new ArrayList<>();
 
-            String sql = "SELECT * FROM `Table` ORDER BY tableNumber";
+            String sql = "SELECT * FROM `table` ORDER BY tableNumber";
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet data = statement.executeQuery();
 
@@ -40,7 +40,7 @@ public class TableDBAccess implements TableDataAccess {
         try {
             Connection connection = SingletonConnection.getInstance();
 
-            String sql = "SELECT * FROM `Table` WHERE tableNumber = ?";
+            String sql = "SELECT * FROM `table` WHERE tableNumber = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             ResultSet data = statement.executeQuery();

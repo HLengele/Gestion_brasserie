@@ -9,37 +9,64 @@ import java.util.ArrayList;
 public class OrderDBAccess implements OrderDataAccess {
 
     @Override
-    public void insertOrder(Order newOrder) throws AddOrderException {
+    public int insertOrder(Order newOrder) throws AddOrderException {
         try {
             Connection connection = SingletonConnection.getInstance();
             String sql = "INSERT INTO `Order` (hour, tableNumber) VALUES (?, ?)";
-            PreparedStatement statement = connection.prepareStatement(sql);
+
+            // On ajoute Statement.RETURN_GENERATED_KEYS pour récupérer l'ID auto-incrémenté
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             statement.setTime(1, Time.valueOf(newOrder.getHour()));
             statement.setInt(2, newOrder.getTableNumber());
 
             statement.executeUpdate();
+
+            // Récupération de l'ID
+            ResultSet rs = statement.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1); // Retourne le nouvel orderId
+            }
+            throw new AddOrderException("Échec : aucun ID généré.");
         } catch (SQLException exception) {
             throw new AddOrderException(exception.getMessage());
         }
     }
-
     @Override
-    public void updateOrder(Order orderToUpdate) throws UpdateOrderException {
+    public void updateOrder(Order order) throws UpdateOrderException {
         try {
             Connection connection = SingletonConnection.getInstance();
             String sql = "UPDATE `Order` SET hour = ?, tableNumber = ? WHERE orderId = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
 
-            statement.setTime(1, Time.valueOf(orderToUpdate.getHour()));
-            statement.setInt(2, orderToUpdate.getTableNumber());
-            statement.setInt(3, orderToUpdate.getOrderId());
+            statement.setTime(1, Time.valueOf(order.getHour()));
+            statement.setInt(2, order.getTableNumber());
+            statement.setInt(3, order.getOrderId());
 
             statement.executeUpdate();
         } catch (SQLException exception) {
             throw new UpdateOrderException(exception.getMessage());
         }
     }
+
+    @Override
+    public void insertLineOrder(int orderId, int beerId, int quantity, double realPrice) throws Exception {
+        try {
+            Connection connection = SingletonConnection.getInstance();
+            String sql = "INSERT INTO Line_Order (quantity, realPrice, orderId, beerId) VALUES (?, ?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setInt(1, quantity);
+            statement.setDouble(2, realPrice);
+            statement.setInt(3, orderId);
+            statement.setInt(4, beerId);
+
+            statement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new Exception("Erreur d'insertion de la ligne de commande : " + exception.getMessage());
+        }
+    }
+
 
     @Override
     public void deleteOrder(int orderID) throws DeleteOrderException {

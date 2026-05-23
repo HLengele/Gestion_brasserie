@@ -21,15 +21,14 @@ public class MainMenu extends JMenuBar {
         // 2. Création de l'option pour gérer les bières
         JMenuItem biereItem = new JMenuItem("Gérer les Bières");
 
-        // 3. Événement lors du clic sur "Gérer les Bières"
         biereItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // On crée une nouvelle instance du panneau de gestion des bières
                 BeerManagementPanel beerPanel = new BeerManagementPanel(mainWindow);
 
-                // On demande à la fenêtre principale d'afficher ce panneau à l'écran
-                mainWindow.changePanel(beerPanel);
+                // On utilise la bonne méthode : setMainPanel (et non changePanel)
+                mainWindow.setMainPanel(beerPanel);
             }
         });
 

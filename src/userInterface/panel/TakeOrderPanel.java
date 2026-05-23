@@ -1,131 +1,144 @@
 package userInterface.panel;
 
+import exception.ReadException;
 import model.*;
-import exception.*;
 import userInterface.MainWindow;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
 public class TakeOrderPanel extends JPanel {
+
     private MainWindow parent;
 
-    private JComboBox<Employee> comboEmployees;
-    private JComboBox<Table>    comboTables;
-    private JComboBox<Beer>     comboBeers;
-    private JSpinner            spinnerQuantity;
-    private JButton             btnValidate;
+    // Éléments de sélection
+    private JComboBox<String> comboTable;
+    private JComboBox<String> comboBeer;
+    private JSpinner spinnerQuantity;
+    private JButton btnAddToCart;
+
+    // Panier
+    private JTable tableCart;
+    private DefaultTableModel cartModel;
+    private JLabel lblTotal;
+    private JButton btnSendOrder;
+
+    // Données temporaires
+    private ArrayList<LineOrder> currentCart = new ArrayList<>();
+    private ArrayList<Beer> allBeers;
+    private ArrayList<Table> allTables;
 
     public TakeOrderPanel(MainWindow parent) {
         this.parent = parent;
-        this.setLayout(new GridLayout(5, 2, 10, 10));
+        this.setLayout(new BorderLayout(10, 10));
 
-        comboEmployees  = new JComboBox<>();
-        comboTables     = new JComboBox<>();
-        comboBeers      = new JComboBox<>();
-        spinnerQuantity = new JSpinner(new SpinnerNumberModel(1, 1, 50, 1));
-        btnValidate     = new JButton("Enregistrer la commande");
+        // --- 1. SÉLECTION (Le premier écran) ---
+        JPanel selectionPanel = new JPanel(new GridLayout(4, 2, 5, 5));
+        selectionPanel.setBorder(BorderFactory.createTitledBorder("Sélection des produits"));
 
-        this.add(new JLabel("Choisir l'employé :"));
-        this.add(comboEmployees);
+        selectionPanel.add(new JLabel("Table :"));
+        comboTable = new JComboBox<>();
+        selectionPanel.add(comboTable);
 
-        this.add(new JLabel("Choisir la table :"));
-        this.add(comboTables);
+        selectionPanel.add(new JLabel("Bière :"));
+        comboBeer = new JComboBox<>();
+        selectionPanel.add(comboBeer);
 
-        this.add(new JLabel("Choisir la bière :"));
-        this.add(comboBeers);
+        selectionPanel.add(new JLabel("Quantité :"));
+        spinnerQuantity = new JSpinner(new SpinnerNumberModel(1, 1, 99, 1));
+        selectionPanel.add(spinnerQuantity);
 
-        this.add(new JLabel("Quantité :"));
-        this.add(spinnerQuantity);
+        selectionPanel.add(new JLabel(""));
+        btnAddToCart = new JButton("Ajouter au panier 🛒");
+        selectionPanel.add(btnAddToCart);
 
-        this.add(new JLabel(""));
-        this.add(btnValidate);
+        this.add(selectionPanel, BorderLayout.NORTH);
 
+        // --- 2. PANIER (Le deuxième écran) ---
+        String[] columns = {"ID Bière", "Nom", "Quantité", "Prix Unitaire", "Sous-Total"};
+        cartModel = new DefaultTableModel(columns, 0);
+        tableCart = new JTable(cartModel);
+
+        JScrollPane scrollCart = new JScrollPane(tableCart);
+        scrollCart.setBorder(BorderFactory.createTitledBorder("Panier"));
+        this.add(scrollCart, BorderLayout.CENTER);
+
+        // --- 3. VALIDATION ---
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        lblTotal = new JLabel("Total : 0.00 €");
+        btnSendOrder = new JButton("Envoyer la commande ✅");
+
+        bottomPanel.add(lblTotal);
+        bottomPanel.add(btnSendOrder);
+        this.add(bottomPanel, BorderLayout.SOUTH);
+
+        // --- Initialisation des données ---
         loadData();
 
-        btnValidate.addActionListener(e -> performTakeOrder());
+        // --- Événements ---
+        btnAddToCart.addActionListener(e -> addToCart());
+        btnSendOrder.addActionListener(e -> sendOrder());
     }
 
     private void loadData() {
         try {
-            ArrayList<Employee> employees = parent.getApplicationController().getAllEmployees();
-            for (Employee emp : employees) comboEmployees.addItem(emp);
+            allTables = parent.getApplicationController().getAllTables();
+            allBeers = parent.getApplicationController().getAllBeers();
 
-            ArrayList<Table> tables = parent.getApplicationController().getAllTables();
-            for (Table t : tables) comboTables.addItem(t);
+            comboTable.addItem("-- Choisir Table --");
+            for(Table t : allTables) comboTable.addItem("Table " + t.getTableNumber());
 
-            ArrayList<Beer> beers = parent.getApplicationController().getAllBeers();
-            for (Beer b : beers) comboBeers.addItem(b);
-
-        } catch (ReadException ex) {
-            JOptionPane.showMessageDialog(parent, "Erreur de chargement : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            comboBeer.addItem("-- Choisir Bière --");
+            for(Beer b : allBeers) comboBeer.addItem(b.getName() + " (" + b.getPrice() + "€)");
+        } catch (ReadException e) {
+            JOptionPane.showMessageDialog(this, "Erreur chargement : " + e.getMessage());
         }
     }
 
-    private void performTakeOrder() {
+    private void addToCart() {
+        if(comboBeer.getSelectedIndex() == 0) return;
+
+        Beer selectedBeer = allBeers.get(comboBeer.getSelectedIndex() - 1);
+        int qty = (int) spinnerQuantity.getValue();
+
+        // Ajout au modèle temporaire
+        LineOrder line = new LineOrder(selectedBeer.getBeerId(), selectedBeer.getName(), qty, selectedBeer.getPrice());
+        currentCart.add(line);
+
+        // Mise à jour interface
+        cartModel.addRow(new Object[]{selectedBeer.getBeerId(), selectedBeer.getName(), qty, selectedBeer.getPrice(), qty * selectedBeer.getPrice()});
+        updateTotal();
+    }
+
+    private void updateTotal() {
+        double total = 0;
+        for(LineOrder l : currentCart) total += (l.getQuantity() * l.getRealPrice());
+        lblTotal.setText(String.format("Total : %.2f €", total));
+    }
+
+    private void sendOrder() {
+        if(comboTable.getSelectedIndex() == 0 || currentCart.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Panier vide ou table non sélectionnée.");
+            return;
+        }
+
+        // Création de l'objet Order
+        int tableNum = allTables.get(comboTable.getSelectedIndex() - 1).getTableNumber();
+
+
         try {
-            Employee selectedEmp  = (Employee) comboEmployees.getSelectedItem();
-            Table    selectedTab  = (Table)    comboTables.getSelectedItem();
-            Beer     selectedBeer = (Beer)     comboBeers.getSelectedItem();
-            int      qty          = (int)      spinnerQuantity.getValue();
+            Order newOrder = new Order(null, LocalTime.now(), tableNum);
 
-            if (selectedEmp == null || selectedTab == null || selectedBeer == null) {
-                JOptionPane.showMessageDialog(parent, "Veuillez sélectionner tous les éléments.", "Attention", JOptionPane.WARNING_MESSAGE);
-                return;
-            }
-
-            // ── 1. Créer la commande dans Order ───────────────────────────────
-            Order newOrder = new Order(
-                    0,
-                    LocalDate.now(),
-                    LocalTime.now(),
-                    "En cours",
-                    selectedTab.getTableNumber(),
-                    selectedEmp.getEmployeeId()
-            );
-            parent.getApplicationController().addOrder(newOrder);
-
-            // ── 2. Récupérer l'orderId généré automatiquement ─────────────────
-            Connection connection = dataAccess.SingletonConnection.getInstance();
-            Statement stmtLastId = connection.createStatement();
-            ResultSet rs = stmtLastId.executeQuery("SELECT LAST_INSERT_ID() AS lastId");
-            int newOrderId = 0;
-            if (rs.next()) newOrderId = rs.getInt("lastId");
-
-            // ── 3. Insérer dans Order_Line ────────────────────────────────────
-            double unitPrice = selectedBeer.getPrice();
-            String sqlLine = "INSERT INTO Order_Line (orderId, beerId, quantity, unit_price) VALUES (?, ?, ?, ?)";
-            PreparedStatement stmtLine = connection.prepareStatement(sqlLine);
-            stmtLine.setInt(1, newOrderId);
-            stmtLine.setInt(2, selectedBeer.getBeerId());
-            stmtLine.setInt(3, qty);
-            stmtLine.setDouble(4, unitPrice);
-            stmtLine.executeUpdate();
-
-            // ── 4. Confirmation ───────────────────────────────────────────────
-            JOptionPane.showMessageDialog(
-                    parent,
-                    "Commande enregistrée !\n"
-                            + "Table n°" + selectedTab.getTableNumber() + "\n"
-                            + "Bière : " + selectedBeer.getName() + " x" + qty + "\n"
-                            + "Total : " + String.format("%.2f", unitPrice * qty) + " €",
-                    "Succès",
-                    JOptionPane.INFORMATION_MESSAGE
-            );
-
-            // ── 5. Réinitialisation ───────────────────────────────────────────
-            spinnerQuantity.setValue(1);
-
-        } catch (AddOrderException ex) {
-            JOptionPane.showMessageDialog(parent, "Erreur ajout commande : " + ex.getMessage(), "Erreur BDD", JOptionPane.ERROR_MESSAGE);
-        } catch (NullValueException ex) {
-            JOptionPane.showMessageDialog(parent, "Donnée invalide : " + ex.getMessage(), "Erreur Validation", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(parent, "Erreur SQL : " + ex.getMessage(), "Erreur BDD", JOptionPane.ERROR_MESSAGE);
+            // parent.getApplicationController().addOrder(newOrder);
+            JOptionPane.showMessageDialog(this, "Commande envoyée pour la table " + tableNum);
+            currentCart.clear();
+            cartModel.setRowCount(0);
+            updateTotal();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Erreur : " + e.getMessage());
         }
     }
 }

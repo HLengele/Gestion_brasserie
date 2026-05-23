@@ -1,59 +1,85 @@
 package userInterface;
 
+// --- VOS IMPORTS ---
+// Si votre ApplicationController est dans un autre package (ex: business), ajustez cette ligne :
 import controller.ApplicationController;
-import userInterface.MainMenu;
+
 import userInterface.components.HomePanel;
+import userInterface.panel.BeerManagementPanel;
+import userInterface.panel.TakeOrderPanel;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class MainWindow extends JFrame {
 
+    // Déclaration de votre contrôleur de base de données
     private ApplicationController applicationController;
-    private Container container;
-    private JPanel currentPanel;
 
     public MainWindow() {
-        super("Gestion de la Brasserie");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(900, 700); // Taille légèrement augmentée pour le confort du tableau des bières
-        this.setLocationRelativeTo(null);
-
-        // Instanciation du Contrôleur Applicatif (Façade)
+        // 1. Initialisation du contrôleur (INDISPENSABLE avant d'afficher quoi que ce soit)
         this.applicationController = new ApplicationController();
 
-        this.container = this.getContentPane();
-        this.container.setLayout(new BorderLayout());
+        // 2. Configuration globale de la fenêtre
+        this.setTitle("Gestion de la Brasserie");
+        this.setSize(1100, 850);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null); // Permet de centrer la fenêtre sur l'écran
 
-        // Ajout de la barre de menu supérieure (on lui passe 'this' pour qu'elle puisse commander la fenêtre)
-        this.setJMenuBar(new MainMenu(this));
+        // 3. Affichage de l'accueil par défaut au démarrage
+        setMainPanel(new HomePanel());
 
-        // Panneau affiché par défaut au démarrage (Accueil)
-        this.currentPanel = new HomePanel();
-        this.container.add(currentPanel, BorderLayout.CENTER);
+        // 4. Initialisation de la barre de navigation
+        initMenu();
 
+        // 5. AFFICHAGE DE LA FENÊTRE (La ligne qui manquait pour que l'appli démarre !)
         this.setVisible(true);
     }
 
-    public ApplicationController getApplicationController() {
-        return applicationController;
+    /**
+     * Crée et configure la barre de menu supérieure
+     */
+    private void initMenu() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menuNavigation = new JMenu("Navigation");
+
+        // Création des boutons du menu
+        JMenuItem itemHome = new JMenuItem("🏠 Accueil");
+        JMenuItem itemBeers = new JMenuItem("🍺 Gestion des Bières");
+        JMenuItem itemOrders = new JMenuItem("📝 Tâches Métiers (Commandes)");
+
+        // Ajout des actions de navigation (changement de panneaux)
+        itemHome.addActionListener(e -> setMainPanel(new HomePanel()));
+        itemBeers.addActionListener(e -> setMainPanel(new BeerManagementPanel(this)));
+        itemOrders.addActionListener(e -> setMainPanel(new TakeOrderPanel(this)));
+
+        // Assemblage des éléments dans le menu
+        menuNavigation.add(itemHome);
+        menuNavigation.addSeparator(); // Petite ligne esthétique
+        menuNavigation.add(itemBeers);
+        menuNavigation.add(itemOrders);
+
+        // Ajout du menu à la barre, et de la barre à la fenêtre
+        menuBar.add(menuNavigation);
+        this.setJMenuBar(menuBar);
     }
 
     /**
-     * Méthode essentielle pour changer dynamiquement le panneau central
-     * Exemple : passer de l'accueil à la gestion des bières
+     * Méthode permettant de vider le centre de la fenêtre
+     * pour y injecter le panneau de votre choix de manière fluide.
      */
-    public void changePanel(JPanel newPanel) {
-        this.container.remove(currentPanel);
-        this.currentPanel = newPanel;
-        this.container.add(currentPanel, BorderLayout.CENTER);
-
-        // On force Swing à recalculer les composants et à redessiner l'interface
-        this.container.validate();
-        this.container.repaint();
+    public void setMainPanel(JPanel newPanel) {
+        this.getContentPane().removeAll(); // On nettoie l'ancien contenu
+        this.getContentPane().add(newPanel, BorderLayout.CENTER); // On ajoute la nouvelle page
+        this.getContentPane().revalidate(); // On recalcule l'affichage
+        this.getContentPane().repaint();    // On redessine l'interface
     }
 
-    public static void main(String[] args) {
-        // Lancement de l'application dans le thread Swing dédié
-        SwingUtilities.invokeLater(() -> new MainWindow());
+    /**
+     * Permet aux différents panneaux (BeerManagementPanel, TakeOrderPanel...)
+     * de récupérer le contrôleur pour communiquer avec la base de données.
+     */
+    public ApplicationController getApplicationController() {
+        return this.applicationController;
     }
 }
