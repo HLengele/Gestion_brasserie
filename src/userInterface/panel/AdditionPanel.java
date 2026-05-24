@@ -1,14 +1,23 @@
 package userInterface.panel;
 
-import model.Table;
 import exception.ReadException;
+import model.Table;
 import userInterface.MainWindow;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
+/**
+ * Panneau d'affichage de l'addition d'une table.
+ * Aligné sur les conventions de UserInterface2 :
+ * - EmptyBorder pour les marges
+ * - BoxLayout Y_AXIS pour l'empilement
+ * - Séparation claire des responsabilités
+ */
 public class AdditionPanel extends JPanel {
+
     private MainWindow parent;
     private JComboBox<Table> comboTables;
     private JButton btnCalculate;
@@ -16,23 +25,39 @@ public class AdditionPanel extends JPanel {
 
     public AdditionPanel(MainWindow parent) {
         this.parent = parent;
-        this.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        this.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        this.add(new JLabel("Numéro de la table :"));
+        // --- Sélection de la table ---
+        JLabel lblTable = new JLabel("Numéro de la table :");
+        lblTable.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         comboTables = new JComboBox<>();
-        this.add(comboTables);
+        comboTables.setMaximumSize(new Dimension(300, 30));
+        comboTables.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // --- Bouton ---
         btnCalculate = new JButton("Afficher l'addition");
-        this.add(btnCalculate);
+        btnCalculate.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // --- Résultat ---
         lblResult = new JLabel("Total : 0.00 €");
-        lblResult.setFont(new Font("Arial", Font.BOLD, 16));
+        lblResult.setFont(new Font("Serif", Font.BOLD, 20));
+        lblResult.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // --- Assemblage ---
+        this.add(Box.createVerticalGlue());
+        this.add(lblTable);
+        this.add(Box.createVerticalStrut(8));
+        this.add(comboTables);
+        this.add(Box.createVerticalStrut(12));
+        this.add(btnCalculate);
+        this.add(Box.createVerticalStrut(20));
         this.add(lblResult);
+        this.add(Box.createVerticalGlue());
 
-        // Chargement des tables existantes
+        // --- Données et événements ---
         loadTables();
-
-        // Écouteur du bouton
         btnCalculate.addActionListener(e -> displayAddition());
     }
 
@@ -43,7 +68,9 @@ public class AdditionPanel extends JPanel {
                 comboTables.addItem(t);
             }
         } catch (ReadException ex) {
-            JOptionPane.showMessageDialog(parent, "Erreur de chargement des tables : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(parent,
+                    "Erreur de chargement des tables : " + ex.getMessage(),
+                    "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -51,13 +78,12 @@ public class AdditionPanel extends JPanel {
         Table selectedTable = (Table) comboTables.getSelectedItem();
         if (selectedTable != null) {
             try {
-                // CORRECTION : Appel direct de la méthode exposée par la Façade (ApplicationController)
                 double total = parent.getApplicationController().calculateTableAddition(selectedTable.getTableNumber());
-
                 lblResult.setText(String.format("Total de la Table %d : %.2f €", selectedTable.getTableNumber(), total));
-
             } catch (ReadException ex) {
-                JOptionPane.showMessageDialog(parent, "Erreur lors du calcul de l'addition : " + ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(parent,
+                        "Erreur lors du calcul de l'addition : " + ex.getMessage(),
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

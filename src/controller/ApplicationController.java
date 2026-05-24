@@ -3,6 +3,7 @@ package controller;
 import business.OrderManager;
 import business.CategoryManager;
 import business.BeerManager; // <-- Nouvel import
+import business.ReservationManager;
 import exception.*;
 import model.*;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 public class ApplicationController {
 
     private OrderManager orderManager;
+    private ReservationManager reservationManager;
     private CategoryManager categoryManager;
     private BeerManager beerManager; // <-- Nouvel attribut
 
@@ -17,6 +19,7 @@ public class ApplicationController {
     public ApplicationController() {
         setOrderManager(new OrderManager());
         setCategoryManager(new CategoryManager());
+        setReservationManager(new ReservationManager());
         setBeerManager(new BeerManager()); // <-- Initialisation
     }
 
@@ -24,6 +27,10 @@ public class ApplicationController {
     public void setOrderManager(OrderManager orderManager) { this.orderManager = orderManager; }
     public void setCategoryManager(CategoryManager categoryManager) { this.categoryManager = categoryManager; }
     public void setBeerManager(BeerManager beerManager) { this.beerManager = beerManager; } // <-- Setter
+    public void setReservationManager(ReservationManager reservationManager) {
+        this.reservationManager = reservationManager;
+    }
+
 
     // ── Délégation : Category (Catégories) ─────────────────────────────────────
     public ArrayList<Category> getAllCategories() throws ReadException {
@@ -34,6 +41,10 @@ public class ApplicationController {
     // Ces méthodes pointent maintenant vers le beerManager !
     public ArrayList<Beer> getAllBeers() throws ReadException {
         return beerManager.getAllBeers();
+    }
+    // La méthode de délégation pour l'UI :
+    public ArrayList<ReservationSearchResult> searchReservationsBetweenDates(java.time.LocalDate start, java.time.LocalDate end) throws ReadException {
+        return reservationManager.searchReservationsBetweenDates(start, end);
     }
 
     public Beer getBeerById(int id) throws ReadException {

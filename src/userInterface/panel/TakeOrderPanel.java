@@ -1,43 +1,50 @@
 package userInterface.panel;
 
 import exception.ReadException;
-import model.*;
+import model.Beer;
+import model.LineOrder;
+import model.Order;
+import model.Table;
 import userInterface.MainWindow;
+import userInterface.components.OrderForm;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.time.LocalTime;
 import java.util.ArrayList;
 
+/**
+ * Panneau de prise de commande (panier).
+ * OrderForm utilisé en simple formulaire de saisie (pas de CRUD ici).
+ */
 public class TakeOrderPanel extends JPanel {
 
     private MainWindow parent;
 
-    // Éléments de sélection
     private JComboBox<String> comboTable;
     private JComboBox<String> comboBeer;
     private JSpinner spinnerQuantity;
     private JButton btnAddToCart;
 
-    // Panier
     private JTable tableCart;
     private DefaultTableModel cartModel;
     private JLabel lblTotal;
     private JButton btnSendOrder;
+    private JButton btnClearCart;
 
-    // Données temporaires
     private ArrayList<LineOrder> currentCart = new ArrayList<>();
-    private ArrayList<Beer> allBeers;
+    private ArrayList<Beer>  allBeers;
     private ArrayList<Table> allTables;
 
     public TakeOrderPanel(MainWindow parent) {
         this.parent = parent;
         this.setLayout(new BorderLayout(10, 10));
+        this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // --- 1. SÉLECTION (Le premier écran) ---
+        // --- Sélection produits (NORTH) ---
         JPanel selectionPanel = new JPanel(new GridLayout(4, 2, 5, 5));
-        selectionPanel.setBorder(BorderFactory.createTitledBorder("Sélection des produits"));
+        selectionPanel.setBorder(BorderFactory.createTitledBorder("1. Sélection des produits"));
 
         selectionPanel.add(new JLabel("Table :"));
         comboTable = new JComboBox<>();
@@ -57,88 +64,121 @@ public class TakeOrderPanel extends JPanel {
 
         this.add(selectionPanel, BorderLayout.NORTH);
 
-        // --- 2. PANIER (Le deuxième écran) ---
+        // --- Panier (CENTER) ---
+        JPanel centerPanel = new JPanel(new BorderLayout(5, 5));
+        centerPanel.setBorder(BorderFactory.createTitledBorder("2. Récapitulatif de la commande"));
+
         String[] columns = {"ID Bière", "Nom", "Quantité", "Prix Unitaire", "Sous-Total"};
-        cartModel = new DefaultTableModel(columns, 0);
+        cartModel = new DefaultTableModel(columns, 0) {
+            @Override public boolean isCellEditable(int r, int c) { return false; }
+        };
         tableCart = new JTable(cartModel);
+        centerPanel.add(new JScrollPane(tableCart), BorderLayout.CENTER);
 
-        JScrollPane scrollCart = new JScrollPane(tableCart);
-        scrollCart.setBorder(BorderFactory.createTitledBorder("Panier"));
-        this.add(scrollCart, BorderLayout.CENTER);
+        // --- Validation (SOUTH du center) ---
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
+        bottomPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
 
-        // --- 3. VALIDATION ---
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         lblTotal = new JLabel("Total : 0.00 €");
+        lblTotal.setFont(new Font("Serif", Font.BOLD, 16));
+
+        btnClearCart = new JButton("Vider le panier 🗑️");
         btnSendOrder = new JButton("Envoyer la commande ✅");
+        btnSendOrder.setBackground(new Color(46, 204, 113));
+        btnSendOrder.setForeground(Color.WHITE);
 
+        bottomPanel.add(btnClearCart);
+        bottomPanel.add(Box.createHorizontalGlue());
         bottomPanel.add(lblTotal);
+        bottomPanel.add(Box.createHorizontalStrut(10));
         bottomPanel.add(btnSendOrder);
-        this.add(bottomPanel, BorderLayout.SOUTH);
 
-        // --- Initialisation des données ---
-        loadData();
+        centerPanel.add(bottomPanel, BorderLayout.SOUTH);
+        this.add(centerPanel, BorderLayout.CENTER);
 
-        // --- Événements ---
+        // --- Données et événements ---
+        loadComboBoxData();
         btnAddToCart.addActionListener(e -> addToCart());
+        btnClearCart.addActionListener(e -> clearCart());
         btnSendOrder.addActionListener(e -> sendOrder());
     }
 
-    private void loadData() {
+    private void loadComboBoxData() {
         try {
             allTables = parent.getApplicationController().getAllTables();
+            comboTable.addItem("-- Sélectionner une table --");
+            for (Table t : allTables) comboTable.addItem("Table " + t.getTableNumber());
+
             allBeers = parent.getApplicationController().getAllBeers();
-
-            comboTable.addItem("-- Choisir Table --");
-            for(Table t : allTables) comboTable.addItem("Table " + t.getTableNumber());
-
-            comboBeer.addItem("-- Choisir Bière --");
-            for(Beer b : allBeers) comboBeer.addItem(b.getName() + " (" + b.getPrice() + "€)");
-        } catch (ReadException e) {
-            JOptionPane.showMessageDialog(this, "Erreur chargement : " + e.getMessage());
+            comboBeer.addItem("-- Sélectionner une bière --");
+            for (Beer b : allBeers) comboBeer.addItem(b.getName() + " - " + b.getPrice() + "€");
+        } catch (ReadException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de chargement : " + ex.getMessage(),
+                    "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void addToCart() {
-        if(comboBeer.getSelectedIndex() == 0) return;
-
+        if (comboBeer.getSelectedIndex() == 0 || comboTable.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner une table et une bière.", "Attention", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
         Beer selectedBeer = allBeers.get(comboBeer.getSelectedIndex() - 1);
         int qty = (int) spinnerQuantity.getValue();
 
-        // Ajout au modèle temporaire
-        LineOrder line = new LineOrder(selectedBeer.getBeerId(), selectedBeer.getName(), qty, selectedBeer.getPrice());
-        currentCart.add(line);
-
-        // Mise à jour interface
-        cartModel.addRow(new Object[]{selectedBeer.getBeerId(), selectedBeer.getName(), qty, selectedBeer.getPrice(), qty * selectedBeer.getPrice()});
-        updateTotal();
+        boolean found = false;
+        for (LineOrder line : currentCart) {
+            if (line.getBeerId() == selectedBeer.getBeerId()) {
+                line.setQuantity(line.getQuantity() + qty);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            currentCart.add(new LineOrder(selectedBeer.getBeerId(), selectedBeer.getName(), qty, selectedBeer.getPrice()));
+        }
+        spinnerQuantity.setValue(1);
+        refreshCartTable();
     }
 
-    private void updateTotal() {
+    private void refreshCartTable() {
+        cartModel.setRowCount(0);
         double total = 0;
-        for(LineOrder l : currentCart) total += (l.getQuantity() * l.getRealPrice());
+        for (LineOrder line : currentCart) {
+            double sub = line.getQuantity() * line.getRealPrice();
+            total += sub;
+            cartModel.addRow(new Object[]{
+                    line.getBeerId(), line.getBeerName(), line.getQuantity(),
+                    String.format("%.2f €", line.getRealPrice()),
+                    String.format("%.2f €", sub)
+            });
+        }
         lblTotal.setText(String.format("Total : %.2f €", total));
     }
 
+    private void clearCart() {
+        currentCart.clear();
+        refreshCartTable();
+    }
+
     private void sendOrder() {
-        if(comboTable.getSelectedIndex() == 0 || currentCart.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Panier vide ou table non sélectionnée.");
+        if (comboTable.getSelectedIndex() == 0 || currentCart.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Panier vide ou table non sélectionnée.", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        // Création de l'objet Order
-        int tableNum = allTables.get(comboTable.getSelectedIndex() - 1).getTableNumber();
-
-
         try {
-            Order newOrder = new Order(null, LocalTime.now(), tableNum);
-
-            // parent.getApplicationController().addOrder(newOrder);
-            JOptionPane.showMessageDialog(this, "Commande envoyée pour la table " + tableNum);
-            currentCart.clear();
-            cartModel.setRowCount(0);
-            updateTotal();
+            int tableNum = allTables.get(comboTable.getSelectedIndex() - 1).getTableNumber();
+            Order newOrder = new Order(0, java.time.LocalTime.now(), tableNum);
+            int newOrderId = parent.getApplicationController().addOrder(newOrder);
+            for (LineOrder line : currentCart) {
+                parent.getApplicationController().addLineOrder(newOrderId, line.getBeerId(), line.getQuantity(), line.getRealPrice());
+            }
+            JOptionPane.showMessageDialog(this, "Commande envoyée pour la table " + tableNum + " ✅");
+            clearCart();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Erreur : " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Erreur : " + e.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
