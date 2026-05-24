@@ -21,7 +21,7 @@ public class ReservationManager {
 
     public ArrayList<ReservationSearchResult> searchReservationsBetweenDates(LocalDate start, LocalDate end) throws ReadException {
         if (start.isAfter(end)) {
-            throw new ReadException("La date de début doit être antérieure ou égale à la date de fin.");
+            throw new ReadException("The start date must be before or equal to the end date.");
         }
         return reservationDao.getReservationsBetweenDates(start, end);
     }

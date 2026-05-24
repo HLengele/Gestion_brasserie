@@ -24,13 +24,13 @@ public class HomePanel extends JPanel {
         centerPanel.setOpaque(false);
 
         // Titre principal
-        JLabel lblWelcome = new JLabel("BIENVENUE", SwingConstants.CENTER);
+        JLabel lblWelcome = new JLabel("Welcome", SwingConstants.CENTER);
         lblWelcome.setFont(new Font("Serif", Font.PLAIN, 72)); // Serif comme UI2
         lblWelcome.setForeground(new Color(44, 62, 80));
         lblWelcome.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Sous-titre
-        JLabel lblSubtitle = new JLabel("Système de gestion de la Brasserie");
+        JLabel lblSubtitle = new JLabel("Brewery Management System");
         lblSubtitle.setFont(new Font("Serif", Font.ITALIC, 22));
         lblSubtitle.setForeground(new Color(127, 140, 141));
         lblSubtitle.setAlignmentX(Component.CENTER_ALIGNMENT);

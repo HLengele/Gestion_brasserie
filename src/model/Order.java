@@ -20,17 +20,17 @@ public class Order {
     public LocalTime getHour() { return hour; }
     public void setHour(LocalTime hour) throws NullValueException {
         if (hour != null) this.hour = hour;
-        else throw new NullValueException("L'heure ne peut pas être nulle");
+        else throw new NullValueException("The hour cannot be null");
     }
 
     public int getTableNumber() { return tableNumber; }
     public void setTableNumber(int tableNumber) throws NullValueException {
         if (tableNumber > 0) this.tableNumber = tableNumber;
-        else throw new NullValueException("Le numéro de table doit être supérieur à 0");
+        else throw new NullValueException("The table number must be greater than 0");
     }
 
     @Override
     public String toString() {
-        return "Commande n°" + orderId + " - Table " + tableNumber + " à " + hour;
+        return "Order n°" + orderId + " - Table " + tableNumber + " at " + hour;
     }
 }

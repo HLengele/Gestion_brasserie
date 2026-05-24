@@ -19,7 +19,6 @@ public class BeerManager {
         this.beerDao = beerDao;
     }
 
-    // ── Méthodes BIÈRES (CRUD) ──────────────────────────────────────────────────
 
     public ArrayList<Beer> getAllBeers() throws ReadException {
         return beerDao.readAll();

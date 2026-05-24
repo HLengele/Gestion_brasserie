@@ -22,7 +22,7 @@ public class MainWindow extends JFrame {
     private ApplicationController applicationController;
 
     public MainWindow() {
-        super("Gestion de la Brasserie");
+        super("Brewery Management");
 
         // 1. Initialisation du contrôleur
         this.applicationController = new ApplicationController();

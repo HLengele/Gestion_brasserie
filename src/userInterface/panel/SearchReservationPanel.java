@@ -96,11 +96,11 @@ public class SearchReservationPanel extends JPanel {
             }
 
             if (results.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Aucune réservation trouvée pour cette période.", "Information", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No reservation found for this period.", "Information", JOptionPane.INFORMATION_MESSAGE);
             }
 
         } catch (ReadException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur de recherche", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Search error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

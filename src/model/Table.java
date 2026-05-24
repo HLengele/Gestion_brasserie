@@ -4,7 +4,7 @@ import exception.NullValueException;
 
 public class Table {
 
-    private int tableNumber;   // PK – correspond à tableNumber en BD
+    private int tableNumber;   // PK – corresponds to tableNumber in DB
     private int nbPlace;       // NOT NULL CHECK > 0
     private String location;   // nullable
 
@@ -25,7 +25,7 @@ public class Table {
         if (tableNumber > 0) {
             this.tableNumber = tableNumber;
         } else {
-            throw new NullValueException("Le numéro de table doit être un entier positif");
+            throw new NullValueException("The table number must be a positive integer");
         }
     }
 
@@ -39,7 +39,7 @@ public class Table {
         if (nbPlace > 0) {
             this.nbPlace = nbPlace;
         } else {
-            throw new NullValueException("La capacité de la table doit être un entier positif");
+            throw new NullValueException("The table capacity must be a positive integer");
         }
     }
 
@@ -50,14 +50,14 @@ public class Table {
     }
 
     public void setLocation(String location) {
-        this.location = location;   // null autorisé
+        this.location = location;   // null allowed
     }
 
     // ── toString ───────────────────────────────────────────────────────────────
 
     @Override
     public String toString() {
-        return "Table n°" + tableNumber + " – " + nbPlace + " places"
+        return "Table n°" + tableNumber + " – " + nbPlace + " seats"
                 + (location != null ? " (" + location + ")" : "");
     }
 }

@@ -45,7 +45,7 @@ public class BeerFormPanel extends JPanel {
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // --- Champs ---
+        // --- Fields ---
         txtId = new JTextField();
         txtId.setEditable(false);
         txtId.setBackground(Color.LIGHT_GRAY);
@@ -53,26 +53,26 @@ public class BeerFormPanel extends JPanel {
         txtName        = new JTextField();
         txtColor       = new JTextField();
         txtPrice       = new JTextField();
-        chkAlcohol     = new JCheckBox("Oui");
+        chkAlcohol     = new JCheckBox("Yes");
         txtLaunchDate  = new JTextField();
         txtDescription = new JTextField();
         txtComment     = new JTextField();
 
         comboCategory = new JComboBox<>();
-        comboCategory.addItem("-- Sélectionner une catégorie --");
+        comboCategory.addItem("-- Select a category --");
 
-        // --- Ajout label + champ pour chaque propriété ---
+        // --- Add label + field for each property ---
         addRow("ID :", txtId);
-        addRow("Nom :", txtName);
-        addRow("Couleur :", txtColor);
-        addRow("Prix (€) :", txtPrice);
-        addRow("Contient de l'alcool :", chkAlcohol);
-        addRow("Date Lancement (YYYY-MM-DD) :", txtLaunchDate);
+        addRow("Name :", txtName);
+        addRow("Color :", txtColor);
+        addRow("Price (€) :", txtPrice);
+        addRow("Contains alcohol :", chkAlcohol);
+        addRow("Launch Date (YYYY-MM-DD) :", txtLaunchDate);
         addRow("Description :", txtDescription);
-        addRow("Commentaire :", txtComment);
-        addRow("Catégorie :", comboCategory);
+        addRow("Comment :", txtComment);
+        addRow("Category :", comboCategory);
 
-        // --- Boutons CRUD en classes dédiées (pattern UI2) ---
+        // --- CRUD buttons in dedicated classes (UI2 pattern) ---
         addButton    = new AddBeerButton(this, parent);
         updateButton = new UpdateBeerButton(this, parent);
         deleteButton = new DeleteBeerButton(this, parent);
@@ -93,7 +93,7 @@ public class BeerFormPanel extends JPanel {
         this.add(groupButtons);
     }
 
-    /** Helper : ajoute un label + composant en paire verticale. */
+    /** Helper: adds a label + component as a vertical pair. */
     private void addRow(String labelText, JComponent field) {
         JLabel label = new JLabel(labelText);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -108,7 +108,7 @@ public class BeerFormPanel extends JPanel {
 
     public void populateCategories(ArrayList<Category> categories) {
         comboCategory.removeAllItems();
-        comboCategory.addItem("-- Sélectionner une catégorie --");
+        comboCategory.addItem("-- Select a category --");
         if (categories != null) {
             for (Category cat : categories) {
                 comboCategory.addItem(cat.getName() + " (" + cat.getCategoryId() + ")");
@@ -131,7 +131,7 @@ public class BeerFormPanel extends JPanel {
         try {
             price = Double.parseDouble(txtPrice.getText().trim().replace(",", "."));
         } catch (NumberFormatException e) {
-            throw new Exception("Le format du prix est invalide.");
+            throw new Exception("The price format is invalid.");
         }
 
         Boolean containsAlcool = chkAlcohol.isSelected();
@@ -142,7 +142,7 @@ public class BeerFormPanel extends JPanel {
             try {
                 launchDate = LocalDate.parse(dateTxt);
             } catch (DateTimeParseException ex) {
-                throw new Exception("Le format de la date est incorrect. Utilisez YYYY-MM-DD.");
+                throw new Exception("The date format is incorrect. Use YYYY-MM-DD.");
             }
         }
 

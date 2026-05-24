@@ -15,7 +15,7 @@ public class ClearBeerButton extends JButton {
     private BeerFormPanel beerForm;
 
     public ClearBeerButton(BeerFormPanel beerForm, MainWindow parent) {
-        super("Vider");
+        super("Clear");
         this.beerForm = beerForm;
         this.addActionListener(new PressListener());
     }

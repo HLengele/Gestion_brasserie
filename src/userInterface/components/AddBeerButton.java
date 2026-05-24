@@ -17,7 +17,7 @@ public class AddBeerButton extends JButton {
     private MainWindow parent;
 
     public AddBeerButton(BeerFormPanel beerForm, MainWindow parent) {
-        super("Ajouter");
+        super("Add");
         this.beerForm = beerForm;
         this.parent = parent;
         this.addActionListener(new PressListener());
@@ -30,13 +30,13 @@ public class AddBeerButton extends JButton {
                 beerForm.setCurrentBeerId(null);
                 Beer newBeer = beerForm.formToBeer();
                 parent.getApplicationController().addBeer(newBeer);
-                JOptionPane.showMessageDialog(parent, "Bière ajoutée avec succès !");
+                JOptionPane.showMessageDialog(parent, "Beer added successfully!");
                 if (beerForm.getBeerTable() != null) beerForm.getBeerTable().loadTable();
                 beerForm.beerToForm(null);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(parent,
-                        "Erreur lors de l'ajout : " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "Error while adding: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

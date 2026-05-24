@@ -30,13 +30,13 @@ public class BeerManagementPanel extends JPanel {
         // --- Tableau (WEST) ---
         beerTable = new BeerTable(parent);
         JScrollPane scrollPane = new JScrollPane(beerTable);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Liste des Bières"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Beer List"));
         scrollPane.setPreferredSize(new Dimension(700, 0));
         this.add(scrollPane, BorderLayout.CENTER);
 
         // --- Formulaire + boutons CRUD (EAST) ---
         beerForm = new BeerFormPanel(parent);
-        beerForm.setBorder(BorderFactory.createTitledBorder("Détails de la Bière"));
+        beerForm.setBorder(BorderFactory.createTitledBorder("Beer Details"));
 
         // Chargement des catégories
         try {
@@ -44,8 +44,8 @@ public class BeerManagementPanel extends JPanel {
             beerForm.populateCategories(categories);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(parent,
-                    "Avertissement : impossible de charger les catégories. " + ex.getMessage(),
-                    "Avertissement", JOptionPane.WARNING_MESSAGE);
+                    "Warning: unable to load categories. " + ex.getMessage(),
+                    "Warning", JOptionPane.WARNING_MESSAGE);
         }
 
         JScrollPane formScroll = new JScrollPane(beerForm);

@@ -24,7 +24,7 @@ public class BeerTable extends JTable {
     public BeerTable(MainWindow parent) {
         this.parent = parent;
 
-        String[] columns = {"ID", "Nom", "Couleur", "Prix", "Alcool", "Lancement", "Description", "Commentaire", "Catégorie"};
+        String[] columns = {"ID", "Name", "Color", "Price", "Alcohol", "Launch", "Description", "Comment", "Category"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -53,7 +53,7 @@ public class BeerTable extends JTable {
                         b.getName(),
                         b.getColor(),
                         String.format("%.2f €", b.getPrice() != null ? b.getPrice() : 0.0),
-                        (b.getContainsAlcool() != null && b.getContainsAlcool()) ? "Oui" : "Non",
+                        (b.getContainsAlcool() != null && b.getContainsAlcool()) ? "Yes" : "No",
                         b.getMarketLaunchDate() != null ? b.getMarketLaunchDate() : "N/A",
                         b.getDescription() != null ? b.getDescription() : "",
                         b.getComment()     != null ? b.getComment()     : "",
@@ -62,14 +62,14 @@ public class BeerTable extends JTable {
             }
         } catch (ReadException ex) {
             JOptionPane.showMessageDialog(parent,
-                    "Erreur de chargement des bières : " + ex.getMessage(),
-                    "Erreur BD", JOptionPane.ERROR_MESSAGE);
+                    "Error loading beers: " + ex.getMessage(),
+                    "DB Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     /**
-     * Lie ce tableau à un formulaire : au clic sur une ligne,
-     * le formulaire est automatiquement rempli avec la bière sélectionnée.
+     * Links this table to a form: when a row is clicked,
+     * the form is automatically filled with the selected beer.
      */
     public void linkToForm(BeerFormPanel form) {
         this.linkedForm = form;
@@ -86,8 +86,8 @@ public class BeerTable extends JTable {
                         linkedForm.beerToForm(beer);
                     } catch (ReadException ex) {
                         JOptionPane.showMessageDialog(parent,
-                                "Erreur de lecture : " + ex.getMessage(),
-                                "Erreur", JOptionPane.ERROR_MESSAGE);
+                                "Read error: " + ex.getMessage(),
+                                "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }

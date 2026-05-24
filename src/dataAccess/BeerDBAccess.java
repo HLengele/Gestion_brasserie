@@ -28,7 +28,7 @@ public class BeerDBAccess implements BeerDataAccess {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new Exception("Erreur lors de l'ajout de la bière : " + e.getMessage());
+            throw new Exception("Error while adding the beer : " + e.getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ public class BeerDBAccess implements BeerDataAccess {
                 beers.add(beer);
             }
         } catch (Exception e) {
-            throw new ReadException("Erreur de lecture des bières : " + e.getMessage());
+            throw new ReadException("Error reading beers : " + e.getMessage());
         }
         return beers;
     }
@@ -95,7 +95,7 @@ public class BeerDBAccess implements BeerDataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new ReadException("Erreur lors de la recherche de la bière : " + e.getMessage());
+            throw new ReadException("Error while searching for the beer : " + e.getMessage());
         }
         return null;
     }
@@ -122,7 +122,7 @@ public class BeerDBAccess implements BeerDataAccess {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new Exception("Erreur lors de la modification de la bière : " + e.getMessage());
+            throw new Exception("Error while updating the beer : " + e.getMessage());
         }
     }
 
@@ -135,7 +135,7 @@ public class BeerDBAccess implements BeerDataAccess {
             statement.setInt(1, beerId);
             statement.executeUpdate();
         } catch (SQLException e) {
-            throw new Exception("Erreur lors de la suppression de la bière. Note : Vérifiez qu'elle n'est pas liée à une commande en cours. Détails : " + e.getMessage());
+            throw new Exception("Error while deleting the beer. Note: Make sure it is not linked to an ongoing order. Details : " + e.getMessage());
         }
     }
 }

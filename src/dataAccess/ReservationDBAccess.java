@@ -45,7 +45,7 @@ public class ReservationDBAccess implements ReservationDataAccess {
                 }
             }
         } catch (SQLException e) {
-            throw new ReadException("Erreur lors de la recherche des réservations : " + e.getMessage());
+            throw new ReadException("Error while searching for reservations : " + e.getMessage());
         }
 
         return results;

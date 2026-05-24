@@ -40,14 +40,14 @@ public class MainMenu extends JMenuBar {
         appMenu.setMnemonic('A');
         this.add(appMenu);
 
-        itemHome = new JMenuItem("🏠 Accueil");
+        itemHome = new JMenuItem("Home");
         itemHome.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         itemHome.addActionListener(new ChangePanelListener("Home"));
         appMenu.add(itemHome);
 
         appMenu.addSeparator();
 
-        itemExit = new JMenuItem("Quitter");
+        itemExit = new JMenuItem("Exit");
         itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
         itemExit.addActionListener(new ExitListener());
         appMenu.add(itemExit);
@@ -57,22 +57,22 @@ public class MainMenu extends JMenuBar {
         gestionMenu.setMnemonic('G');
         this.add(gestionMenu);
 
-        itemBeers = new JMenuItem("🍺 Bières");
+        itemBeers = new JMenuItem("Beers");
         itemBeers.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK));
         itemBeers.addActionListener(new ChangePanelListener("Beers"));
         gestionMenu.add(itemBeers);
 
-        itemOrders = new JMenuItem("📝 Commandes");
+        itemOrders = new JMenuItem("Orders");
         itemOrders.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
         itemOrders.addActionListener(new ChangePanelListener("Orders"));
         gestionMenu.add(itemOrders);
 
-        itemAddition = new JMenuItem("🧾 Addition");
+        itemAddition = new JMenuItem("Addition");
         itemAddition.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
         itemAddition.addActionListener(new ChangePanelListener("Addition"));
         gestionMenu.add(itemAddition);
 
-        itemSearchReservations = new JMenuItem("🔍 Recherche Réservations");
+        itemSearchReservations = new JMenuItem("Reservations");
         itemSearchReservations.addActionListener(new ChangePanelListener("SearchReservations"));
         gestionMenu.addSeparator(); // Pour faire plus propre
         gestionMenu.add(itemSearchReservations);

@@ -59,7 +59,7 @@ public class TakeOrderPanel extends JPanel {
         selectionPanel.add(spinnerQuantity);
 
         selectionPanel.add(new JLabel(""));
-        btnAddToCart = new JButton("Ajouter au panier 🛒");
+        btnAddToCart = new JButton("Ajouter au panier");
         selectionPanel.add(btnAddToCart);
 
         this.add(selectionPanel, BorderLayout.NORTH);
@@ -83,10 +83,8 @@ public class TakeOrderPanel extends JPanel {
         lblTotal = new JLabel("Total : 0.00 €");
         lblTotal.setFont(new Font("Serif", Font.BOLD, 16));
 
-        btnClearCart = new JButton("Vider le panier 🗑️");
-        btnSendOrder = new JButton("Envoyer la commande ✅");
-        btnSendOrder.setBackground(new Color(46, 204, 113));
-        btnSendOrder.setForeground(Color.WHITE);
+        btnClearCart = new JButton("Vider le panier");
+        btnSendOrder = new JButton("Envoyer la commande");
 
         bottomPanel.add(btnClearCart);
         bottomPanel.add(Box.createHorizontalGlue());

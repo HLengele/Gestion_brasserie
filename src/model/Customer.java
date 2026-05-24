@@ -18,7 +18,6 @@ public class Customer {
         setName(name);
     }
 
-    // ── Getters / Setters ──────────────────────────────────────────────────────
 
     public int getCustomerId() {
         return customerId;
@@ -28,7 +27,7 @@ public class Customer {
         if (customerId >= 0) {
             this.customerId = customerId;
         } else {
-            throw new NullValueException("L'identifiant du client ne peut pas être négatif");
+            throw new NullValueException("The customer ID cannot be negative");
         }
     }
 
@@ -40,7 +39,7 @@ public class Customer {
         if (email != null && !email.isBlank()) {
             this.email = email;
         } else {
-            throw new NullValueException("L'email du client ne peut pas être vide");
+            throw new NullValueException("The customer's email cannot be empty");
         }
     }
 
@@ -60,27 +59,17 @@ public class Customer {
         if (name != null && !name.isBlank()) {
             this.name = name;
         } else {
-            throw new NullValueException("Le nom du client ne peut pas être vide");
+            throw new NullValueException("The customer's name cannot be empty");
         }
     }
 
-    // ── Méthodes métier ────────────────────────────────────────────────────────
 
-    /**
-     * Crée une commande (faisant office de réservation) pour ce client.
-     *
-     * @param hour      Heure de la réservation/commande
-     * @param table     Table réservée
-     * @return          L'objet Order créé conforme à la nouvelle structure
-     */
     public Order reserveTable(LocalTime hour, Table table)
             throws NullValueException {
         if (table == null) {
-            throw new NullValueException("Impossible de réserver une table nulle");
+            throw new NullValueException("Cannot reserve a null table");
         }
 
-        // Le constructeur mis à jour d'Order attend uniquement : (orderId, hour, tableNumber)
-        // On initialise l'ID à 0 (auto-incrémenté par MySQL)
         return new Order(
                 0,
                 hour,
@@ -88,7 +77,6 @@ public class Customer {
         );
     }
 
-    // ── toString ───────────────────────────────────────────────────────────────
 
     @Override
     public String toString() {

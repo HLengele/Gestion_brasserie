@@ -80,8 +80,6 @@ public class ApplicationController {
     public void addLineOrder(int orderId, int beerId, int quantity, double realPrice) throws Exception {
         orderManager.addLineOrder(orderId, beerId, quantity, realPrice);
     }
-    public void updateOrder(Order orderToUpdate) throws UpdateOrderException { orderManager.updateOrder(orderToUpdate); }
-    public void deleteOrder(int orderID) throws DeleteOrderException { orderManager.deleteOrder(orderID); }
 
     // ── Délégation : Table (Tables) ────────────────────────────────────────────
     public ArrayList<Table> getAllTables() throws ReadException { return orderManager.getAllTables(); }
@@ -96,7 +94,7 @@ public class ApplicationController {
         // 1. Récupérer la bière pour obtenir son prix actuel
         Beer beer = beerManager.getBeerById(beerId);
         if (beer == null) {
-            throw new Exception("La bière sélectionnée n'existe pas.");
+            throw new Exception("The selected beer does not exist.");
         }
         double currentPrice = beer.getPrice();
 

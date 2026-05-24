@@ -5,16 +5,13 @@ import java.time.LocalDate;
 
 public class Employee {
 
-    // ── Attributs du diagramme ─────────────────────────────────────────────────
     private Integer employeeId;
     private String lastName;
     private String firstName;
     private LocalDate hiringDate;
 
-    // ── Relations (issues du diagramme) ────────────────────────────────────────
     private City city;
 
-    // ── Constructeur ───────────────────────────────────────────────────────────
     public Employee(Integer employeeId, String firstName, String lastName, LocalDate hiringDate, City city)
             throws NullValueException {
         setEmployeeId(employeeId);
@@ -24,7 +21,6 @@ public class Employee {
         setCity(city);
     }
 
-    // ── Getters / Setters ──────────────────────────────────────────────────────
 
     public Integer getEmployeeId() {
         return employeeId;
@@ -42,7 +38,7 @@ public class Employee {
         if (firstName != null && !firstName.isBlank()) {
             this.firstName = firstName;
         } else {
-            throw new NullValueException("Le prénom de l'employé ne peut pas être vide");
+            throw new NullValueException("The employee's first name cannot be empty");
         }
     }
 
@@ -54,7 +50,7 @@ public class Employee {
         if (lastName != null && !lastName.isBlank()) {
             this.lastName = lastName;
         } else {
-            throw new NullValueException("Le nom de l'employé ne peut pas être vide");
+            throw new NullValueException("The employee's last name cannot be empty");
         }
     }
 
@@ -74,22 +70,13 @@ public class Employee {
         this.city = city;
     }
 
-    // ── Méthodes métier ────────────────────────────────────────────────────────
-
-    /**
-     * Crée et retourne une nouvelle commande associée à une table.
-     * Adapté au nouveau schéma BD (orderId, hour, tableNumber).
-     *
-     * @param table  La table pour laquelle la commande est créée
-     * @return       La commande créée
-     */
     public Order takeOrder(Table table) throws NullValueException {
         if (table == null) {
-            throw new NullValueException("Impossible de prendre une commande pour une table nulle");
+            throw new NullValueException("Cannot take an order for a null table");
         }
 
-        // Initialisation automatique avec l'ID 0 (géré par l'AUTO_INCREMENT de la BDD)
-        // et uniquement avec l'heure et le numéro de table (conformément à la BDD)
+        // Automatic initialization with ID 0 (handled by the DB AUTO_INCREMENT)
+        // and only with the time and table number (in accordance with the DB)
         return new Order(
                 0,
                 java.time.LocalTime.now(),
@@ -97,21 +84,12 @@ public class Employee {
         );
     }
 
-    /**
-     * Collecte (clôture) une commande.
-     * ATTENTION : Le champ "status" n'existant plus en BDD, cette méthode
-     * devra utiliser une autre logique si vous souhaitez conserver un historique.
-     *
-     * @param order  La commande à clôturer
-     */
     public void collect(Order order) throws NullValueException {
         if (order != null) {
-            // L'instruction order.setStatus("Payée") a été retirée car elle est incompatible avec la BD.
-            // À l'avenir, vous pourriez par exemple supprimer la commande ou l'archiver dans une autre table.
+            // The instruction order.setStatus("Paid") has been removed as it is incompatible with the DB.
+            // In the future, you could for example delete the order or archive it in another table.
         }
     }
-
-    // ── toString ───────────────────────────────────────────────────────────────
 
     @Override
     public String toString() {

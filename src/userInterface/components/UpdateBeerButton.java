@@ -17,7 +17,7 @@ public class UpdateBeerButton extends JButton {
     private MainWindow parent;
 
     public UpdateBeerButton(BeerFormPanel beerForm, MainWindow parent) {
-        super("Modifier");
+        super("Edit");
         this.beerForm = beerForm;
         this.parent = parent;
         this.addActionListener(new PressListener());
@@ -30,17 +30,17 @@ public class UpdateBeerButton extends JButton {
                 Beer beerToUpdate = beerForm.formToBeer();
                 if (beerToUpdate.getBeerId() == null || beerToUpdate.getBeerId() == 0) {
                     JOptionPane.showMessageDialog(parent,
-                            "Veuillez sélectionner une bière à modifier.",
-                            "Attention", JOptionPane.WARNING_MESSAGE);
+                            "Select a beer to edit.",
+                            "Warning", JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 parent.getApplicationController().updateBeer(beerToUpdate);
-                JOptionPane.showMessageDialog(parent, "Bière mise à jour !");
+                JOptionPane.showMessageDialog(parent, "Beer updated!");
                 if (beerForm.getBeerTable() != null) beerForm.getBeerTable().loadTable();
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(parent,
-                        "Erreur de mise à jour : " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "Update error : " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

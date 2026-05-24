@@ -17,7 +17,7 @@ public class DeleteBeerButton extends JButton {
     private MainWindow parent;
 
     public DeleteBeerButton(BeerFormPanel beerForm, MainWindow parent) {
-        super("Supprimer");
+        super("Delete");
         this.beerForm = beerForm;
         this.parent = parent;
         this.addActionListener(new PressListener());
@@ -30,13 +30,13 @@ public class DeleteBeerButton extends JButton {
 
             if (beerId == null) {
                 JOptionPane.showMessageDialog(parent,
-                        "Vous devez d'abord sélectionner une bière !",
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "You must first select a beer!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             int choice = JOptionPane.showConfirmDialog(parent,
-                    "Voulez-vous vraiment supprimer la bière #" + beerId + " ?",
+                    "Are you sure you want to delete " + beerId + " ?",
                     "Confirmation", JOptionPane.YES_NO_OPTION);
 
             if (choice == JOptionPane.YES_OPTION) {
@@ -47,8 +47,8 @@ public class DeleteBeerButton extends JButton {
                     beerForm.beerToForm(null);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(parent,
-                            "Erreur lors de la suppression : " + ex.getMessage(),
-                            "Erreur", JOptionPane.ERROR_MESSAGE);
+                            "Error during deletion : " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }

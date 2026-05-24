@@ -25,16 +25,16 @@ public class OrderForm extends JPanel {
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        JLabel lblId = new JLabel("ID Commande (Auto) :");
+        JLabel lblId = new JLabel("ID Order :");
         txtOrderId = new JTextField();
         txtOrderId.setEditable(false);
         txtOrderId.setBackground(java.awt.Color.LIGHT_GRAY);
 
-        JLabel lblHour = new JLabel("Heure (HH:mm:ss) :");
+        JLabel lblHour = new JLabel("Hour (HH:mm:ss) :");
         txtHour = new JTextField();
-        txtHour.setToolTipText("Format HH:mm:ss (ex: 14:30:00)");
+        txtHour.setToolTipText("Format HH:mm:ss ");
 
-        JLabel lblTable = new JLabel("Numéro de Table :");
+        JLabel lblTable = new JLabel("Table Number :");
         spinnerTableNumber = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
 
         this.add(lblId);
@@ -68,7 +68,7 @@ public class OrderForm extends JPanel {
         try {
             hour = LocalTime.parse(txtHour.getText().trim());
         } catch (Exception e) {
-            throw new IllegalArgumentException("Le format de l'heure est incorrect (HH:mm:ss requis).");
+            throw new IllegalArgumentException("The time format is incorrect (HH:mm:ss required).");
         }
         int tableNumber = (int) spinnerTableNumber.getValue();
         int id = (currentOrderId == null) ? 0 : currentOrderId;

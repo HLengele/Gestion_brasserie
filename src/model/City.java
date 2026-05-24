@@ -4,12 +4,10 @@ import exception.NullValueException;
 
 public class City {
 
-    // ── Attributs du diagramme ─────────────────────────────────────────────────
     private Integer id;
     private String name;
     private String postalCode;
 
-    // ── Constructeurs ──────────────────────────────────────────────────────────
 
     public City(Integer id, String name, String postalCode) throws NullValueException {
         setId(id);
@@ -17,7 +15,6 @@ public class City {
         setPostalCode(postalCode);
     }
 
-    // ── Getters / Setters ──────────────────────────────────────────────────────
 
     public Integer getId() {
         return id;
@@ -35,7 +32,7 @@ public class City {
         if (name != null && !name.isBlank()) {
             this.name = name;
         } else {
-            throw new NullValueException("Le nom de la ville ne peut pas être vide");
+            throw new NullValueException("The city name cannot be empty");
         }
     }
 
@@ -47,11 +44,10 @@ public class City {
         if (postalCode != null && !postalCode.isBlank()) {
             this.postalCode = postalCode;
         } else {
-            throw new NullValueException("Le code postal ne peut pas être vide");
+            throw new NullValueException("The postal code cannot be empty");
         }
     }
 
-    // ── toString ───────────────────────────────────────────────────────────────
 
     @Override
     public String toString() {
