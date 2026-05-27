@@ -27,7 +27,6 @@ public class Beer {
         this.categoryId = categoryId;
     }
 
-    // Getters et Setters avec vérifications de base
     public Integer getBeerId() { return beerId; }
     public void setBeerId(Integer beerId) { this.beerId = beerId; }
 
@@ -38,7 +37,6 @@ public class Beer {
     }
 
     public String getColor() { return color; }
-    public void setColor(String color) { this.color = color; }
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) throws NullValueException {
@@ -46,21 +44,28 @@ public class Beer {
         this.price = price;
     }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public Boolean getContainsAlcool() { return containsAlcool; }
-    public void setContainsAlcool(Boolean containsAlcool) { this.containsAlcool = containsAlcool; }
+    public Boolean getContainsAlcool() {
+        return containsAlcool;
+    }
 
-    public LocalDate getMarketLaunchDate() { return marketLaunchDate; }
-    public void setMarketLaunchDate(LocalDate marketLaunchDate) { this.marketLaunchDate = marketLaunchDate; }
+    public LocalDate getMarketLaunchDate() {
+        return marketLaunchDate;
+    }
 
-    public String getComment() { return comment; }
-    public void setComment(String comment) { this.comment = comment; }
+    public String getComment() {
+        return comment;
+    }
 
-    public Integer getCategoryId() { return categoryId; }
-    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
+    public Integer getCategoryId() {
+        return categoryId;
+    }
 
     @Override
-    public String toString() { return name + " (" + color + ") - " + price + "€"; }
+    public String toString() {
+        return name + " (" + color + ") - " + price + "€";
+    }
 }

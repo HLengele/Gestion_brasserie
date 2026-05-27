@@ -8,56 +8,48 @@ import java.util.ArrayList;
 
 public class OrderDBAccess implements OrderDataAccess {
 
-
     @Override
-    public ArrayList<Order> readAll() throws ReadException {
+    public int insertOrder(Order newOrder) throws AddOrderException {
+        String sql = "INSERT INTO `Order` (hour, tableNumber) VALUES (?, ?)";
+
         try {
             Connection connection = SingletonConnection.getInstance();
-            ArrayList<Order> orders = new ArrayList<>();
 
-            String sql = "SELECT * FROM `Order` ORDER BY orderId";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            ResultSet data = statement.executeQuery();
+            try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            while(data.next()) {
-                Time sqlTime = data.getTime("hour");
-                LocalTime localTime = (sqlTime != null) ? sqlTime.toLocalTime() : LocalTime.now();
-                Order order = new Order(
-                        data.getInt("orderId"),
-                        localTime,
-                        data.getInt("tableNumber")
-                );
-                orders.add(order);
+                statement.setTime(1, Time.valueOf(newOrder.getHour()));
+                statement.setInt(2, newOrder.getTableNumber());
+                statement.executeUpdate();
+
+                try (ResultSet rs = statement.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+                throw new AddOrderException("Échec de l'insertion : aucun ID n'a été généré.");
             }
-            return orders;
-        } catch (Exception exception) {
-            throw new ReadException(exception.getMessage());
+        } catch (SQLException exception) {
+            throw new AddOrderException("Erreur SQL lors de l'ajout de la commande : " + exception.getMessage());
         }
     }
 
     @Override
-    public Order readById(int id) throws ReadException {
+    public void insertLineOrder(int orderId, int beerId, int quantity, double realPrice) throws Exception {
+        String sql = "INSERT INTO Line_Order (quantity, realPrice, orderId, beerId) VALUES (?, ?, ?, ?)";
+
         try {
             Connection connection = SingletonConnection.getInstance();
-            Order order = null;
 
-            String sql = "SELECT * FROM `Order` WHERE orderId = ?";
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, id);
-            ResultSet data = statement.executeQuery();
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setInt(1, quantity);
+                statement.setDouble(2, realPrice);
+                statement.setInt(3, orderId);
+                statement.setInt(4, beerId);
 
-            if (data.next()) {
-                Time sqlTime = data.getTime("hour");
-                LocalTime localTime = (sqlTime != null) ? sqlTime.toLocalTime() : LocalTime.now();
-                order = new Order(
-                        data.getInt("orderId"),
-                        localTime,
-                        data.getInt("tableNumber")
-                );
+                statement.executeUpdate();
             }
-            return order;
-        } catch (Exception exception) {
-            throw new ReadException(exception.getMessage());
+        } catch (SQLException exception) {
+            throw new Exception("Erreur lors de l'insertion de la ligne de commande : " + exception.getMessage());
         }
     }
 
@@ -65,9 +57,11 @@ public class OrderDBAccess implements OrderDataAccess {
     @Override
     public double getTotalPriceByTable(int tableNumber) throws ReadException {
         double total = 0.0;
-        String query = "SELECT SUM(lo.realPrice * lo.quantity) AS total_addition " +
-                "FROM Line_Order lo " +
-                "JOIN `Order` o ON lo.orderId = o.orderId " +
+
+        // Utilisation d'un LEFT JOIN : si aucune ligne de commande, le SUM renverra 0 proprement au lieu de tout bloquer
+        String query = "SELECT SUM(lo.realPrice * lo.quantity) " +
+                "FROM `Order` o " +
+                "LEFT JOIN Line_Order lo ON o.orderId = lo.orderId " +
                 "WHERE o.tableNumber = ?;";
 
         try (Connection connection = SingletonConnection.getInstance();
@@ -77,7 +71,8 @@ public class OrderDBAccess implements OrderDataAccess {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    total = rs.getDouble("total_addition");
+                    // Utiliser rs.getDouble(1) prend la première colonne calculée, c'est 100% fiable
+                    total = rs.getDouble(1);
                 }
             }
 

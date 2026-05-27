@@ -20,14 +20,9 @@ public class EmployeeDBAccess implements EmployeeDataAccess {
             ResultSet data = statement.executeQuery();
 
             while(data.next()) {
-                // 1. Conversion de la date d'embauche
                 Date sqlDate = data.getDate("hiringDate");
                 LocalDate localHiringDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                // 2. Récupération de la ville (Initialisé à null)
-                // Si vous liez plus tard avec CityDBAccess, vous pourrez faire :
-                // int cityId = data.getInt("cityId");
-                // City city = new CityDBAccess().readById(cityId);
                 City city = null;
 
                 // 3. Instanciation de l'employé (sans le paramètre capacite)
@@ -58,14 +53,11 @@ public class EmployeeDBAccess implements EmployeeDataAccess {
             ResultSet data = statement.executeQuery();
 
             if (data.next()) {
-                // 1. Conversion de la date d'embauche
                 Date sqlDate = data.getDate("hiringDate");
                 LocalDate localHiringDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                // 2. Récupération de la ville (Initialisé à null)
                 City city = null;
 
-                // 3. Instanciation de l'employé (sans le paramètre capacite ni la lecture de colonne obsolète)
                 employee = new Employee(
                         data.getInt("employeeId"),
                         data.getString("firstName"),

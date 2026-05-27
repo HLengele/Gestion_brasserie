@@ -1,11 +1,14 @@
 package dataAccess;
 
-import exception.*;
+import exception.AddOrderException;
 import model.Order;
 import java.util.ArrayList;
+import exception.ReadException;
+
 
 public interface OrderDataAccess {
-    ArrayList<Order> readAll() throws ReadException;
-    Order readById(int id) throws ReadException;
+    int insertOrder(Order newOrder) throws AddOrderException;
+    void insertLineOrder(int orderId, int beerId, int quantity, double realPrice) throws Exception;
+
     double getTotalPriceByTable(int tableNumber) throws ReadException;
 }

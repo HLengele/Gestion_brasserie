@@ -11,14 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
-/**
- * Formulaire de saisie des données d'une bière.
- * Refactorisé selon le pattern OrderForm de UserInterface2 :
- * - BoxLayout Y_AXIS + EmptyBorder
- * - Boutons CRUD en classes dédiées (AddBeerButton, UpdateBeerButton, DeleteBeerButton, ClearBeerButton)
- * - Groupés dans un JPanel horizontal (BoxLayout X_AXIS)
- * - Référence à BeerTable pour le rafraîchissement (getBeerTable().loadTable())
- */
+
 public class BeerFormPanel extends JPanel {
 
     private JTextField txtId;
@@ -38,14 +31,12 @@ public class BeerFormPanel extends JPanel {
 
     private JPanel groupButtons;
 
-    // Référence vers le tableau pour rafraîchissement après CRUD
     private BeerTable beerTable;
 
     public BeerFormPanel(MainWindow parent) {
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        // --- Fields ---
         txtId = new JTextField();
         txtId.setEditable(false);
         txtId.setBackground(Color.LIGHT_GRAY);
@@ -72,7 +63,6 @@ public class BeerFormPanel extends JPanel {
         addRow("Comment :", txtComment);
         addRow("Category :", comboCategory);
 
-        // --- CRUD buttons in dedicated classes (UI2 pattern) ---
         addButton    = new AddBeerButton(this, parent);
         updateButton = new UpdateBeerButton(this, parent);
         deleteButton = new DeleteBeerButton(this, parent);
@@ -93,7 +83,6 @@ public class BeerFormPanel extends JPanel {
         this.add(groupButtons);
     }
 
-    /** Helper: adds a label + component as a vertical pair. */
     private void addRow(String labelText, JComponent field) {
         JLabel label = new JLabel(labelText);
         label.setAlignmentX(Component.LEFT_ALIGNMENT);

@@ -14,10 +14,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
 
-/**
- * Panneau de prise de commande (panier).
- * OrderForm utilisé en simple formulaire de saisie (pas de CRUD ici).
- */
 public class TakeOrderPanel extends JPanel {
 
     private MainWindow parent;
@@ -64,7 +60,6 @@ public class TakeOrderPanel extends JPanel {
 
         this.add(selectionPanel, BorderLayout.NORTH);
 
-        // --- Panier (CENTER) ---
         JPanel centerPanel = new JPanel(new BorderLayout(5, 5));
         centerPanel.setBorder(BorderFactory.createTitledBorder("2. Récapitulatif de la commande"));
 
@@ -75,7 +70,6 @@ public class TakeOrderPanel extends JPanel {
         tableCart = new JTable(cartModel);
         centerPanel.add(new JScrollPane(tableCart), BorderLayout.CENTER);
 
-        // --- Validation (SOUTH du center) ---
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
         bottomPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
@@ -95,7 +89,6 @@ public class TakeOrderPanel extends JPanel {
         centerPanel.add(bottomPanel, BorderLayout.SOUTH);
         this.add(centerPanel, BorderLayout.CENTER);
 
-        // --- Données et événements ---
         loadComboBoxData();
         btnAddToCart.addActionListener(e -> addToCart());
         btnClearCart.addActionListener(e -> clearCart());

@@ -7,10 +7,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Bouton "Modifier" une bière.
- * Classe dédiée selon le pattern de UserInterface2 (UpdateButton).
- */
+
 public class UpdateBeerButton extends JButton {
 
     private BeerFormPanel beerForm;

@@ -4,10 +4,6 @@ import userInterface.MainWindow;
 
 import javax.swing.*;
 
-/**
- * Fabrique de panneaux : centralise la création et le changement de vues.
- * Pattern repris de UserInterface2 pour une navigation plus propre.
- */
 public class PanelFactory {
 
     public JPanel createPanel(String type, MainWindow parent) {

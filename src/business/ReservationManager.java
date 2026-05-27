@@ -3,7 +3,7 @@ package business;
 import dataAccess.ReservationDBAccess;
 import dataAccess.ReservationDataAccess;
 import exception.ReadException;
-import model.ReservationSearchResult;
+import model.Reservation;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class ReservationManager {
         this.reservationDao = reservationDao;
     }
 
-    public ArrayList<ReservationSearchResult> searchReservationsBetweenDates(LocalDate start, LocalDate end) throws ReadException {
+    public ArrayList<Reservation> searchReservationsBetweenDates(LocalDate start, LocalDate end) throws ReadException {
         if (start.isAfter(end)) {
             throw new ReadException("The start date must be before or equal to the end date.");
         }

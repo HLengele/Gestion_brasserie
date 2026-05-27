@@ -9,10 +9,7 @@ import javax.swing.border.EmptyBorder;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Formulaire de commande simple (pas de CRUD ici).
- * Le CRUD est sur Beer. OrderForm sert juste à saisir/afficher une commande.
- */
+
 public class OrderForm extends JPanel {
 
     private JTextField txtOrderId;

@@ -4,9 +4,9 @@ import exception.NullValueException;
 
 public class Table {
 
-    private int tableNumber;   // PK – corresponds to tableNumber in DB
-    private int nbPlace;       // NOT NULL CHECK > 0
-    private String location;   // nullable
+    private int tableNumber;
+    private int nbPlace;
+    private String location;
 
     public Table(int tableNumber, int nbPlace, String location)
             throws NullValueException {
@@ -15,7 +15,6 @@ public class Table {
         setLocation(location);
     }
 
-    // ── tableNumber ────────────────────────────────────────────────────────────
 
     public int getTableNumber() {
         return tableNumber;
@@ -29,7 +28,6 @@ public class Table {
         }
     }
 
-    // ── nbPlace ────────────────────────────────────────────────────────────────
 
     public int getNbPlace() {
         return nbPlace;
@@ -43,7 +41,6 @@ public class Table {
         }
     }
 
-    // ── location (nullable) ────────────────────────────────────────────────────
 
     public String getLocation() {
         return location;
@@ -53,7 +50,6 @@ public class Table {
         this.location = location;   // null allowed
     }
 
-    // ── toString ───────────────────────────────────────────────────────────────
 
     @Override
     public String toString() {

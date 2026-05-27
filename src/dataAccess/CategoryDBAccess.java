@@ -18,7 +18,6 @@ public class CategoryDBAccess implements CategoryDataAccess {
             ArrayList<Category> categories = new ArrayList<>();
             Category category = null;
 
-            // Tri par 'name' au lieu de 'id' pour que l'affichage dans la JComboBox soit alphabétique
             String sql = "SELECT * FROM Category ORDER BY name";
 
             PreparedStatement statement = connection.prepareStatement(sql);
@@ -60,7 +59,6 @@ public class CategoryDBAccess implements CategoryDataAccess {
             }
             return category;
         } catch (SQLException exception) {
-            // J'ai ajouté l'affichage du message d'erreur ici pour faciliter votre débogage
             throw new ReadException(exception.getMessage());
         }
     }

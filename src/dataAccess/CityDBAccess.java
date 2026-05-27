@@ -26,7 +26,7 @@ public class CityDBAccess implements CityDataAccess {
                 cities.add(city);
             }
             return cities;
-        } catch (Exception exception) { // Utilisation de Exception pour capturer SQLException et NullValueException
+        } catch (Exception exception) {
             throw new ReadException(exception.getMessage());
         }
     }

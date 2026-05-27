@@ -6,11 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Bouton "Supprimer" une bière.
- * Classe dédiée selon le pattern de UserInterface2 (DeleteButton).
- * Demande une confirmation avant suppression.
- */
+
 public class DeleteBeerButton extends JButton {
 
     private BeerFormPanel beerForm;

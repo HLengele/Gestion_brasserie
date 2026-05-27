@@ -1,53 +1,63 @@
 package dataAccess;
 
+import model.Customer;
+import model.Reservation;
+import model.Table;
 import exception.ReadException;
-import model.ReservationSearchResult;
-
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class ReservationDBAccess implements ReservationDataAccess {
 
-    @Override
-    public ArrayList<ReservationSearchResult> getReservationsBetweenDates(LocalDate startDate, LocalDate endDate) throws ReadException {
-        ArrayList<ReservationSearchResult> results = new ArrayList<>();
+    public ArrayList<Reservation> getReservationsBetweenDates(LocalDate start, LocalDate end) throws ReadException {
+        ArrayList<Reservation> list = new ArrayList<>();
 
-        // Jointure sur Reservation (r), Customer (c), City (ci)
-        String sql = "SELECT r.date, r.nbPeople, c.name AS customerName, ci.name AS cityName, ci.postalCode, r.tableNumber " +
+        String sql = "SELECT r.reservationId, r.date, r.nbPeople, " +
+                "       c.customerId, c.name AS customerName, c.phone, c.email, " +
+                "       t.tableNumber, t.nbPlace, t.location " +
                 "FROM Reservation r " +
                 "JOIN Customer c ON r.customerId = c.customerId " +
-                "JOIN City ci ON c.cityId = ci.id " +
-                "WHERE DATE(r.date) BETWEEN ? AND ? " +
-                "ORDER BY r.date ASC";
+                "JOIN `table` t ON r.tableNumber = t.tableNumber " +
+                "WHERE DATE(r.date) BETWEEN ? AND ?";
 
         try (Connection connection = SingletonConnection.getInstance();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setDate(1, Date.valueOf(startDate));
-            statement.setDate(2, Date.valueOf(endDate));
+            statement.setDate(1, java.sql.Date.valueOf(start));
+            statement.setDate(2, java.sql.Date.valueOf(end));
 
-            try (ResultSet data = statement.executeQuery()) {
-                while (data.next()) {
-                    Timestamp sqlTimestamp = data.getTimestamp("date");
-                    LocalDateTime localDateTime = (sqlTimestamp != null) ? sqlTimestamp.toLocalDateTime() : null;
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
 
-                    ReservationSearchResult result = new ReservationSearchResult(
-                            localDateTime,
-                            data.getInt("nbPeople"),
-                            data.getString("customerName"),
-                            data.getString("cityName"),
-                            data.getString("postalCode"),
-                            data.getInt("tableNumber")
+                    Customer customer = new Customer(
+                            rs.getInt("customerId"),
+                            rs.getString("email"),
+                            rs.getString("phone"),
+                            rs.getString("customerName")
                     );
-                    results.add(result);
+
+                    Table table = new Table(
+                            rs.getInt("tableNumber"),
+                            rs.getInt("nbPlace"),
+                            rs.getString("location")
+                    );
+
+                    // Instanciation de la Réservation
+                    Reservation reservation = new Reservation(
+                            rs.getInt("reservationId"),
+                            rs.getTimestamp("date").toLocalDateTime().toLocalDate(),
+                            rs.getInt("nbPeople"),
+                            customer,
+                            table
+                    );
+
+                    list.add(reservation);
                 }
             }
-        } catch (SQLException e) {
-            throw new ReadException("Error while searching for reservations : " + e.getMessage());
+        } catch (Exception e) {
+            throw new ReadException("Erreur lors de la recherche des réservations : " + e.getMessage());
         }
-
-        return results;
+        return list;
     }
 }

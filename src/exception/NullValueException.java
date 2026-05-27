@@ -1,9 +1,8 @@
 package exception;
 
-/**
- * Lancée lorsqu'une valeur obligatoire est nulle ou vide.
- * Utilisée dans les setters de toutes les classes modèle.
- */
+
+// Lancée lorsqu'une valeur obligatoire est nulle ou vide.
+
 public class NullValueException extends Exception {
 
     private String fieldName;

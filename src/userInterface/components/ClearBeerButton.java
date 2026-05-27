@@ -6,10 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-/**
- * Bouton "Vider" le formulaire bière.
- * Équivalent du DefaultButton de UserInterface2.
- */
+
 public class ClearBeerButton extends JButton {
 
     private BeerFormPanel beerForm;

@@ -10,11 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
-/**
- * Tableau JTable affichant la liste des bières.
- * Expose loadTable() pour le rafraîchissement après chaque opération CRUD,
- * appelé par les boutons dédiés (pattern UI2 : orderForm.getOrderTable().loadTable()).
- */
+
 public class BeerTable extends JTable {
 
     private DefaultTableModel tableModel;
@@ -39,10 +35,7 @@ public class BeerTable extends JTable {
         loadTable();
     }
 
-    /**
-     * (Re)charge toutes les bières depuis la base de données.
-     * Appelé par les boutons CRUD après chaque opération.
-     */
+
     public void loadTable() {
         tableModel.setRowCount(0);
         try {
@@ -67,10 +60,6 @@ public class BeerTable extends JTable {
         }
     }
 
-    /**
-     * Links this table to a form: when a row is clicked,
-     * the form is automatically filled with the selected beer.
-     */
     public void linkToForm(BeerFormPanel form) {
         this.linkedForm = form;
         form.setBeerTable(this);

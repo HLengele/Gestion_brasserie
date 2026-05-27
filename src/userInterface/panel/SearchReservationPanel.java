@@ -1,7 +1,7 @@
 package userInterface.panel;
 
 import exception.ReadException;
-import model.ReservationSearchResult;
+import model.Reservation;
 import userInterface.MainWindow;
 
 import javax.swing.*;
@@ -28,7 +28,6 @@ public class SearchReservationPanel extends JPanel {
         this.setLayout(new BorderLayout(10, 10));
         this.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-        // --- SECTION NORD : Critères de recherche (Les 2 JSpinners) ---
         JPanel searchPanel = new JPanel();
         searchPanel.setBorder(BorderFactory.createTitledBorder("Critères de recherche : Réservations entre deux dates"));
 
@@ -52,8 +51,7 @@ public class SearchReservationPanel extends JPanel {
 
         this.add(searchPanel, BorderLayout.NORTH);
 
-        // --- SECTION CENTRE : Résultats de la recherche (JTable) ---
-        String[] columns = {"Date de Réservation", "Nb Personnes", "Client", "Ville", "Code Postal", "Table N°"};
+        String[] columns = {"Date", "Nb Personnes", "Client", "Email", "Table N°", "Emplacement Table"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -64,34 +62,32 @@ public class SearchReservationPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createTitledBorder("Résultats de la recherche"));
         this.add(scrollPane, BorderLayout.CENTER);
 
-        // --- ACTION BOUTON ---
         btnSearch.addActionListener(e -> performSearch());
     }
 
     private void performSearch() {
-        // Extraction des LocalDate depuis les JSpinner
         Date dateStartVal = (Date) spinnerStartDate.getValue();
         Date dateEndVal = (Date) spinnerEndDate.getValue();
 
         LocalDate startDate = dateStartVal.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         LocalDate endDate = dateEndVal.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        tableModel.setRowCount(0); // Vider le tableau avant la recherche
+        tableModel.setRowCount(0);
 
         try {
-            ArrayList<ReservationSearchResult> results = parent.getApplicationController()
+            ArrayList<Reservation> results = parent.getApplicationController()
                     .searchReservationsBetweenDates(startDate, endDate);
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            for (ReservationSearchResult res : results) {
+            for (Reservation res : results) {
                 tableModel.addRow(new Object[]{
-                        res.getDate() != null ? res.getDate().format(formatter) : "N/A",
+                        res.getDate() != null ? res.getDate().format(formatter) : "",
                         res.getNbPeople(),
-                        res.getCustomerName(),
-                        res.getCityName(),
-                        res.getPostalCode(),
-                        res.getTableNumber()
+                        res.getCustomer().getName(),
+                        res.getCustomer().getEmail(),
+                        res.getTable().getTableNumber(),
+                        res.getTable().getLocation() != null ? res.getTable().getLocation() : "Standard"
                 });
             }
 

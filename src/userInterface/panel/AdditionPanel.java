@@ -9,13 +9,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
 
-/**
- * Panneau d'affichage de l'addition d'une table.
- * Aligné sur les conventions de UserInterface2 :
- * - EmptyBorder pour les marges
- * - BoxLayout Y_AXIS pour l'empilement
- * - Séparation claire des responsabilités
- */
 public class AdditionPanel extends JPanel {
 
     private MainWindow parent;
@@ -28,7 +21,6 @@ public class AdditionPanel extends JPanel {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // --- Sélection de la table ---
         JLabel lblTable = new JLabel("Numéro de la table :");
         lblTable.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -36,16 +28,13 @@ public class AdditionPanel extends JPanel {
         comboTables.setMaximumSize(new Dimension(300, 30));
         comboTables.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // --- Bouton ---
         btnCalculate = new JButton("Afficher l'addition");
         btnCalculate.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // --- Résultat ---
         lblResult = new JLabel("Total : 0.00 €");
         lblResult.setFont(new Font("Serif", Font.BOLD, 20));
         lblResult.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // --- Assemblage ---
         this.add(Box.createVerticalGlue());
         this.add(lblTable);
         this.add(Box.createVerticalStrut(8));
@@ -56,7 +45,6 @@ public class AdditionPanel extends JPanel {
         this.add(lblResult);
         this.add(Box.createVerticalGlue());
 
-        // --- Données et événements ---
         loadTables();
         btnCalculate.addActionListener(e -> displayAddition());
     }

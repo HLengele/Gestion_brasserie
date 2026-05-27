@@ -75,8 +75,6 @@ public class Employee {
             throw new NullValueException("Cannot take an order for a null table");
         }
 
-        // Automatic initialization with ID 0 (handled by the DB AUTO_INCREMENT)
-        // and only with the time and table number (in accordance with the DB)
         return new Order(
                 0,
                 java.time.LocalTime.now(),
@@ -86,8 +84,6 @@ public class Employee {
 
     public void collect(Order order) throws NullValueException {
         if (order != null) {
-            // The instruction order.setStatus("Paid") has been removed as it is incompatible with the DB.
-            // In the future, you could for example delete the order or archive it in another table.
         }
     }
 

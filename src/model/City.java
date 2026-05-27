@@ -36,10 +36,6 @@ public class City {
         }
     }
 
-    public String getPostalCode() {
-        return postalCode;
-    }
-
     public void setPostalCode(String postalCode) throws NullValueException {
         if (postalCode != null && !postalCode.isBlank()) {
             this.postalCode = postalCode;
