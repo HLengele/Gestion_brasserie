@@ -26,10 +26,10 @@ public class OrderDBAccess implements OrderDataAccess {
                         return rs.getInt(1);
                     }
                 }
-                throw new AddOrderException("Échec de l'insertion : aucun ID n'a été généré.");
+                throw new AddOrderException("Failure: no ID was generated.");
             }
         } catch (SQLException exception) {
-            throw new AddOrderException("Erreur SQL lors de l'ajout de la commande : " + exception.getMessage());
+            throw new AddOrderException("SQL error while adding the order: " + exception.getMessage());
         }
     }
 
@@ -49,7 +49,7 @@ public class OrderDBAccess implements OrderDataAccess {
                 statement.executeUpdate();
             }
         } catch (SQLException exception) {
-            throw new Exception("Erreur lors de l'insertion de la ligne de commande : " + exception.getMessage());
+            throw new Exception("Error while inserting the order line: " + exception.getMessage());
         }
     }
 
@@ -58,7 +58,7 @@ public class OrderDBAccess implements OrderDataAccess {
     public double getTotalPriceByTable(int tableNumber) throws ReadException {
         double total = 0.0;
 
-        // Utilisation d'un LEFT JOIN : si aucune ligne de commande, le SUM renverra 0 proprement au lieu de tout bloquer
+        // Using a LEFT JOIN: if no order lines exist, SUM will return 0 cleanly instead of blocking everything
         String query = "SELECT SUM(lo.realPrice * lo.quantity) " +
                 "FROM `Order` o " +
                 "LEFT JOIN Line_Order lo ON o.orderId = lo.orderId " +
@@ -71,13 +71,13 @@ public class OrderDBAccess implements OrderDataAccess {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Utiliser rs.getDouble(1) prend la première colonne calculée, c'est 100% fiable
+                    // Using rs.getDouble(1) retrieves the first calculated column, which is 100% reliable
                     total = rs.getDouble(1);
                 }
             }
 
         } catch (SQLException e) {
-            throw new ReadException("Erreur lors du calcul de l'addition : " + e.getMessage());
+            throw new ReadException("Error while calculating the bill: " + e.getMessage());
         }
 
         return total;

@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
-
 public class BeerFormPanel extends JPanel {
 
     private JTextField txtId;
@@ -30,7 +29,6 @@ public class BeerFormPanel extends JPanel {
     private ClearBeerButton  clearButton;
 
     private JPanel groupButtons;
-
     private BeerTable beerTable;
 
     public BeerFormPanel(MainWindow parent) {
@@ -52,16 +50,15 @@ public class BeerFormPanel extends JPanel {
         comboCategory = new JComboBox<>();
         comboCategory.addItem("-- Select a category --");
 
-        // --- Add label + field for each property ---
-        addRow("ID :", txtId);
-        addRow("Name :", txtName);
-        addRow("Color :", txtColor);
-        addRow("Price (€) :", txtPrice);
-        addRow("Contains alcohol :", chkAlcohol);
+        addRow("ID :",                       txtId);
+        addRow("Name :",                     txtName);
+        addRow("Color :",                    txtColor);
+        addRow("Price (€) :",               txtPrice);
+        addRow("Contains alcohol :",         chkAlcohol);
         addRow("Launch Date (YYYY-MM-DD) :", txtLaunchDate);
-        addRow("Description :", txtDescription);
-        addRow("Comment :", txtComment);
-        addRow("Category :", comboCategory);
+        addRow("Description :",              txtDescription);
+        addRow("Comment :",                  txtComment);
+        addRow("Category :",                 comboCategory);
 
         addButton    = new AddBeerButton(this, parent);
         updateButton = new UpdateBeerButton(this, parent);
@@ -135,17 +132,19 @@ public class BeerFormPanel extends JPanel {
             }
         }
 
-        Integer categoryId = null;
+        Category category = null;
         String selectedCat = (String) comboCategory.getSelectedItem();
         if (selectedCat != null && !selectedCat.startsWith("--")) {
             int openParen  = selectedCat.lastIndexOf("(");
             int closeParen = selectedCat.lastIndexOf(")");
             if (openParen != -1 && closeParen != -1) {
-                categoryId = Integer.parseInt(selectedCat.substring(openParen + 1, closeParen));
+                Integer categoryId = Integer.parseInt(selectedCat.substring(openParen + 1, closeParen));
+                String  catName    = selectedCat.substring(0, openParen).trim();
+                category = new Category(categoryId, catName);
             }
         }
 
-        return new Beer(id, name, color, price, description, containsAlcool, launchDate, comment, categoryId);
+        return new Beer(id, name, color, price, description, containsAlcool, launchDate, comment, category);
     }
 
     public void beerToForm(Beer beer) {
@@ -171,11 +170,11 @@ public class BeerFormPanel extends JPanel {
         txtDescription.setText(beer.getDescription() != null ? beer.getDescription() : "");
         txtComment.setText(beer.getComment()          != null ? beer.getComment()    : "");
 
-        Integer targetCatId = beer.getCategoryId();
-        if (targetCatId != null && targetCatId != 0) {
+        Category cat = beer.getCategory();
+        if (cat != null) {
             for (int i = 0; i < comboCategory.getItemCount(); i++) {
                 String item = comboCategory.getItemAt(i);
-                if (item.endsWith("(" + targetCatId + ")")) {
+                if (item.endsWith("(" + cat.getCategoryId() + ")")) {
                     comboCategory.setSelectedIndex(i);
                     break;
                 }

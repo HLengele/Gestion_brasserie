@@ -21,17 +21,17 @@ public class AdditionPanel extends JPanel {
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        JLabel lblTable = new JLabel("Numéro de la table :");
+        JLabel lblTable = new JLabel("Table number:");
         lblTable.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         comboTables = new JComboBox<>();
         comboTables.setMaximumSize(new Dimension(300, 30));
         comboTables.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        btnCalculate = new JButton("Afficher l'addition");
+        btnCalculate = new JButton("Display the bill");
         btnCalculate.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        lblResult = new JLabel("Total : 0.00 €");
+        lblResult = new JLabel("Total: 0.00 €");
         lblResult.setFont(new Font("Serif", Font.BOLD, 20));
         lblResult.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -57,8 +57,8 @@ public class AdditionPanel extends JPanel {
             }
         } catch (ReadException ex) {
             JOptionPane.showMessageDialog(parent,
-                    "Erreur de chargement des tables : " + ex.getMessage(),
-                    "Erreur", JOptionPane.ERROR_MESSAGE);
+                    "Error loading tables: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -67,11 +67,11 @@ public class AdditionPanel extends JPanel {
         if (selectedTable != null) {
             try {
                 double total = parent.getApplicationController().calculateTableAddition(selectedTable.getTableNumber());
-                lblResult.setText(String.format("Total de la Table %d : %.2f €", selectedTable.getTableNumber(), total));
+                lblResult.setText(String.format("Total for Table %d: %.2f €", selectedTable.getTableNumber(), total));
             } catch (ReadException ex) {
                 JOptionPane.showMessageDialog(parent,
-                        "Erreur lors du calcul de l'addition : " + ex.getMessage(),
-                        "Erreur", JOptionPane.ERROR_MESSAGE);
+                        "Error while calculating the bill: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

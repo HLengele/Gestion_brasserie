@@ -29,7 +29,7 @@ public class SearchReservationPanel extends JPanel {
         this.setBorder(new EmptyBorder(15, 15, 15, 15));
 
         JPanel searchPanel = new JPanel();
-        searchPanel.setBorder(BorderFactory.createTitledBorder("Critères de recherche : Réservations entre deux dates"));
+        searchPanel.setBorder(BorderFactory.createTitledBorder("Search criteria: Reservations between two dates"));
 
         SpinnerDateModel modelStart = new SpinnerDateModel();
         spinnerStartDate = new JSpinner(modelStart);
@@ -39,19 +39,19 @@ public class SearchReservationPanel extends JPanel {
         spinnerEndDate = new JSpinner(modelEnd);
         spinnerEndDate.setEditor(new JSpinner.DateEditor(spinnerEndDate, "dd/MM/yyyy"));
 
-        btnSearch = new JButton("Rechercher");
+        btnSearch = new JButton("Search");
 
-        searchPanel.add(new JLabel("Date de début :"));
+        searchPanel.add(new JLabel("Start date:"));
         searchPanel.add(spinnerStartDate);
         searchPanel.add(Box.createHorizontalStrut(20));
-        searchPanel.add(new JLabel("Date de fin :"));
+        searchPanel.add(new JLabel("End date:"));
         searchPanel.add(spinnerEndDate);
         searchPanel.add(Box.createHorizontalStrut(20));
         searchPanel.add(btnSearch);
 
         this.add(searchPanel, BorderLayout.NORTH);
 
-        String[] columns = {"Date", "Nb Personnes", "Client", "Email", "Table N°", "Emplacement Table"};
+        String[] columns = {"Date", "Nb People", "Customer", "Email", "City", "Postal Code", "Table N°", "Location"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -59,7 +59,7 @@ public class SearchReservationPanel extends JPanel {
         tableResults = new JTable(tableModel);
 
         JScrollPane scrollPane = new JScrollPane(tableResults);
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Résultats de la recherche"));
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Search results"));
         this.add(scrollPane, BorderLayout.CENTER);
 
         btnSearch.addActionListener(e -> performSearch());
@@ -80,14 +80,19 @@ public class SearchReservationPanel extends JPanel {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-            for (Reservation res : results) {
+            for (Reservation reservation : results) {
+                String cityName = (reservation.getCustomer().getCity() != null) ? reservation.getCustomer().getCity().getName() : "Not provided";
+                String postalCode = (reservation.getCustomer().getCity() != null) ? reservation.getCustomer().getCity().getPostalCode() : "N/A";
+
                 tableModel.addRow(new Object[]{
-                        res.getDate() != null ? res.getDate().format(formatter) : "",
-                        res.getNbPeople(),
-                        res.getCustomer().getName(),
-                        res.getCustomer().getEmail(),
-                        res.getTable().getTableNumber(),
-                        res.getTable().getLocation() != null ? res.getTable().getLocation() : "Standard"
+                        reservation.getDate() != null ? reservation.getDate().format(formatter) : "",
+                        reservation.getNbPeople(),
+                        reservation.getCustomer().getName(),
+                        reservation.getCustomer().getEmail(),
+                        cityName,
+                        postalCode,
+                        reservation.getTable().getTableNumber(),
+                        reservation.getTable().getLocation() != null ? reservation.getTable().getLocation() : "Standard"
                 });
             }
 

@@ -2,7 +2,6 @@ package dataAccess;
 
 import exception.ReadException;
 import model.Category;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,55 +10,50 @@ import java.util.ArrayList;
 
 public class CategoryDBAccess implements CategoryDataAccess {
 
+    @Override
     public ArrayList<Category> readAll() throws ReadException {
-        try {
-            Connection connection = SingletonConnection.getInstance();
+        ArrayList<Category> categories = new ArrayList<>();
+        String sql = "SELECT * FROM Category ORDER BY name";
 
-            ArrayList<Category> categories = new ArrayList<>();
-            Category category = null;
+        // Using try-with-resources to automatically close statement and data
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet data = statement.executeQuery()) {
 
-            String sql = "SELECT * FROM Category ORDER BY name";
-
-            PreparedStatement statement = connection.prepareStatement(sql);
-
-            ResultSet data = statement.executeQuery();
-
-            while(data.next()) {
-                category = new Category(
+            while (data.next()) {
+                // The constructor may throw a NullValueException
+                categories.add(new Category(
                         data.getInt("id"),
                         data.getString("name")
-                );
-                categories.add(category);
+                ));
             }
             return categories;
-        } catch (SQLException sqlException) {
-            throw new ReadException(sqlException.getMessage());
+        } catch (Exception e) {
+            // Catches everything (SQLException or NullValueException)
+            throw new ReadException("Error while reading categories: " + e.getMessage());
         }
     }
 
+    @Override
     public Category readById(int id) throws ReadException {
-        try {
-            Connection connection = SingletonConnection.getInstance();
+        String sql = "SELECT * FROM Category WHERE id = ?";
 
-            Category category = null;
-
-            String sql = "SELECT * FROM Category WHERE id = ?";
-
-            PreparedStatement statement = connection.prepareStatement(sql);
+        try (Connection connection = SingletonConnection.getInstance();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, id);
 
-            ResultSet data = statement.executeQuery();
-
-            while(data.next()) {
-                category = new Category(
-                        data.getInt("id"),
-                        data.getString("name")
-                );
+            try (ResultSet data = statement.executeQuery()) {
+                if (data.next()) {
+                    return new Category(
+                            data.getInt("id"),
+                            data.getString("name")
+                    );
+                }
             }
-            return category;
-        } catch (SQLException exception) {
-            throw new ReadException(exception.getMessage());
+            return null; // Returns null if no category found with this ID
+        } catch (Exception e) {
+            throw new ReadException("Error while searching for category ID " + id + ": " + e.getMessage());
         }
     }
 }

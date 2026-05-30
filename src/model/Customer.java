@@ -10,12 +10,23 @@ public class Customer {
     private String phone;
     private String name;
 
-    public Customer(int customerId, String email, String phone, String name)
+    private City city;
+
+    public Customer(int customerId, String email, String phone, String name, City city)
             throws NullValueException {
         setCustomerId(customerId);
         setEmail(email);
         setPhone(phone);
         setName(name);
+        setCity(city);
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 
 
@@ -63,7 +74,6 @@ public class Customer {
         }
     }
 
-
     public Order reserveTable(LocalTime hour, Table table)
             throws NullValueException {
         if (table == null) {
@@ -76,7 +86,6 @@ public class Customer {
                 table.getTableNumber()
         );
     }
-
 
     @Override
     public String toString() {

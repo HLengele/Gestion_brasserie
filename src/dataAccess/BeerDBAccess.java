@@ -2,6 +2,7 @@ package dataAccess;
 
 import exception.ReadException;
 import model.Beer;
+import model.Category; // N'oublie pas l'import !
 import java.sql.*;
 import java.util.ArrayList;
 import java.time.LocalDate;
@@ -23,8 +24,12 @@ public class BeerDBAccess implements BeerDataAccess {
             statement.setDate(6, beer.getMarketLaunchDate() != null ? Date.valueOf(beer.getMarketLaunchDate()) : null);
             statement.setString(7, beer.getComment());
 
-            if (beer.getCategoryId() != null) statement.setInt(8, beer.getCategoryId());
-            else statement.setNull(8, Types.INTEGER);
+            // MODIFICATION : On va chercher l'ID dans l'objet Category s'il existe
+            if (beer.getCategory() != null) {
+                statement.setInt(8, beer.getCategory().getCategoryId());
+            } else {
+                statement.setNull(8, Types.INTEGER);
+            }
 
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -35,7 +40,13 @@ public class BeerDBAccess implements BeerDataAccess {
     @Override
     public ArrayList<Beer> readAll() throws ReadException {
         ArrayList<Beer> beers = new ArrayList<>();
-        String sql = "SELECT * FROM Beer ORDER BY name";
+
+        // MODIFICATION : LEFT JOIN pour récupérer les infos de la catégorie
+        String sql = "SELECT b.*, c.id AS catId, c.name AS catName " +
+                "FROM Beer b " +
+                "LEFT JOIN Category c ON b.categoryId = c.id " +
+                "ORDER BY b.name";
+
         try (Connection connection = SingletonConnection.getInstance();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet data = statement.executeQuery()) {
@@ -44,9 +55,14 @@ public class BeerDBAccess implements BeerDataAccess {
                 Date sqlDate = data.getDate("marketLaunchDate");
                 LocalDate localDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                Integer catId = data.getInt("categoryId");
-                if (data.wasNull()) catId = null;
+                // MODIFICATION : Instanciation de la Category si elle n'est pas nulle
+                int catId = data.getInt("catId");
+                Category category = null;
+                if (!data.wasNull()) {
+                    category = new Category(catId, data.getString("catName"));
+                }
 
+                // MODIFICATION : Injection de l'objet Category dans la Beer
                 Beer beer = new Beer(
                         data.getInt("beerId"),
                         data.getString("name"),
@@ -56,7 +72,7 @@ public class BeerDBAccess implements BeerDataAccess {
                         data.getBoolean("containsAlcool"),
                         localDate,
                         data.getString("comment"),
-                        catId
+                        category
                 );
                 beers.add(beer);
             }
@@ -68,7 +84,12 @@ public class BeerDBAccess implements BeerDataAccess {
 
     @Override
     public Beer readById(int id) throws ReadException {
-        String sql = "SELECT * FROM Beer WHERE beerId = ?";
+        // MODIFICATION : LEFT JOIN ici aussi
+        String sql = "SELECT b.*, c.id AS catId, c.name AS catName " +
+                "FROM Beer b " +
+                "LEFT JOIN Category c ON b.categoryId = c.id " +
+                "WHERE b.beerId = ?";
+
         try (Connection connection = SingletonConnection.getInstance();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -78,8 +99,12 @@ public class BeerDBAccess implements BeerDataAccess {
                     Date sqlDate = data.getDate("marketLaunchDate");
                     LocalDate localDate = (sqlDate != null) ? sqlDate.toLocalDate() : null;
 
-                    Integer catId = data.getInt("categoryId");
-                    if (data.wasNull()) catId = null;
+                    // MODIFICATION : Instanciation de la Category
+                    int catId = data.getInt("catId");
+                    Category category = null;
+                    if (!data.wasNull()) {
+                        category = new Category(catId, data.getString("catName"));
+                    }
 
                     return new Beer(
                             data.getInt("beerId"),
@@ -90,7 +115,7 @@ public class BeerDBAccess implements BeerDataAccess {
                             data.getBoolean("containsAlcool"),
                             localDate,
                             data.getString("comment"),
-                            catId
+                            category
                     );
                 }
             }
@@ -115,8 +140,12 @@ public class BeerDBAccess implements BeerDataAccess {
             statement.setDate(6, beer.getMarketLaunchDate() != null ? Date.valueOf(beer.getMarketLaunchDate()) : null);
             statement.setString(7, beer.getComment());
 
-            if (beer.getCategoryId() != null) statement.setInt(8, beer.getCategoryId());
-            else statement.setNull(8, Types.INTEGER);
+            // MODIFICATION : Extraction de l'ID depuis l'objet
+            if (beer.getCategory() != null) {
+                statement.setInt(8, beer.getCategory().getCategoryId());
+            } else {
+                statement.setNull(8, Types.INTEGER);
+            }
 
             statement.setInt(9, beer.getBeerId());
 

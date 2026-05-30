@@ -20,7 +20,7 @@ public class ApplicationController {
         setOrderManager(new OrderManager());
         setCategoryManager(new CategoryManager());
         setReservationManager(new ReservationManager());
-        setBeerManager(new BeerManager()); // <-- Initialisation
+        setBeerManager(new BeerManager());
     }
 
     // ── Setters ────────────────────────────────────────────────────────────────

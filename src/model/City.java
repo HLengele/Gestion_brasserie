@@ -28,6 +28,10 @@ public class City {
         return name;
     }
 
+    public String getPostalCode() {
+        return postalCode;
+    }
+
     public void setName(String name) throws NullValueException {
         if (name != null && !name.isBlank()) {
             this.name = name;

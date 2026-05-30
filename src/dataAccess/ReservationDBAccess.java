@@ -1,5 +1,6 @@
 package dataAccess;
 
+import model.City;
 import model.Customer;
 import model.Reservation;
 import model.Table;
@@ -13,11 +14,14 @@ public class ReservationDBAccess implements ReservationDataAccess {
     public ArrayList<Reservation> getReservationsBetweenDates(LocalDate start, LocalDate end) throws ReadException {
         ArrayList<Reservation> list = new ArrayList<>();
 
+        // MODIFICATION: Added backticks around the reserved word `table`
         String sql = "SELECT r.reservationId, r.date, r.nbPeople, " +
                 "       c.customerId, c.name AS customerName, c.phone, c.email, " +
+                "       ci.id AS cityId, ci.name AS cityName, ci.postalCode, " +
                 "       t.tableNumber, t.nbPlace, t.location " +
                 "FROM Reservation r " +
                 "JOIN Customer c ON r.customerId = c.customerId " +
+                "LEFT JOIN City ci ON c.cityId = ci.id " +
                 "JOIN `table` t ON r.tableNumber = t.tableNumber " +
                 "WHERE DATE(r.date) BETWEEN ? AND ?";
 
@@ -30,11 +34,21 @@ public class ReservationDBAccess implements ReservationDataAccess {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
 
+                    City city = null;
+                    if (rs.getInt("cityId") != 0) {
+                        city = new City(
+                                rs.getInt("cityId"),
+                                rs.getString("cityName"),
+                                rs.getString("postalCode")
+                        );
+                    }
+
                     Customer customer = new Customer(
                             rs.getInt("customerId"),
                             rs.getString("email"),
                             rs.getString("phone"),
-                            rs.getString("customerName")
+                            rs.getString("customerName"),
+                            city
                     );
 
                     Table table = new Table(
@@ -43,7 +57,6 @@ public class ReservationDBAccess implements ReservationDataAccess {
                             rs.getString("location")
                     );
 
-                    // Instanciation de la Réservation
                     Reservation reservation = new Reservation(
                             rs.getInt("reservationId"),
                             rs.getTimestamp("date").toLocalDateTime().toLocalDate(),
@@ -56,7 +69,7 @@ public class ReservationDBAccess implements ReservationDataAccess {
                 }
             }
         } catch (Exception e) {
-            throw new ReadException("Erreur lors de la recherche des réservations : " + e.getMessage());
+            throw new ReadException("Error while searching for reservations: " + e.getMessage());
         }
         return list;
     }

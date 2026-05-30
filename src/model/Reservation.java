@@ -6,8 +6,9 @@ public class Reservation {
     private int id;
     private LocalDate date;
     private int nbPeople;
-    private Customer customer;
     private Table table;
+
+    private Customer customer;
 
     public Reservation(int id, LocalDate date, int nbPeople, Customer customer, Table table) {
         this.id = id;

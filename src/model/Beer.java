@@ -12,10 +12,11 @@ public class Beer {
     private Boolean containsAlcool;
     private LocalDate marketLaunchDate;
     private String comment;
-    private Integer categoryId;
+
+    private Category category;
 
     public Beer(Integer beerId, String name, String color, Double price, String description,
-                Boolean containsAlcool, LocalDate marketLaunchDate, String comment, Integer categoryId) throws NullValueException {
+                Boolean containsAlcool, LocalDate marketLaunchDate, String comment, Category category) throws NullValueException {
         this.beerId = beerId;
         setName(name);
         this.color = color;
@@ -24,7 +25,7 @@ public class Beer {
         this.containsAlcool = containsAlcool;
         this.marketLaunchDate = marketLaunchDate;
         this.comment = comment;
-        this.categoryId = categoryId;
+        setCategory(category);
     }
 
     public Integer getBeerId() { return beerId; }
@@ -60,12 +61,17 @@ public class Beer {
         return comment;
     }
 
-    public Integer getCategoryId() {
-        return categoryId;
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     @Override
     public String toString() {
-        return name + " (" + color + ") - " + price + "€";
+        String catName = (category != null) ? category.getName() : "Sans catégorie";
+        return name + " (" + color + ") [" + catName + "] - " + price + "€";
     }
 }

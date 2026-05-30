@@ -40,17 +40,17 @@ public class BeerTable extends JTable {
         tableModel.setRowCount(0);
         try {
             ArrayList<Beer> beers = parent.getApplicationController().getAllBeers();
-            for (Beer b : beers) {
+            for (Beer beer : beers) {
                 tableModel.addRow(new Object[]{
-                        b.getBeerId(),
-                        b.getName(),
-                        b.getColor(),
-                        String.format("%.2f €", b.getPrice() != null ? b.getPrice() : 0.0),
-                        (b.getContainsAlcool() != null && b.getContainsAlcool()) ? "Yes" : "No",
-                        b.getMarketLaunchDate() != null ? b.getMarketLaunchDate() : "N/A",
-                        b.getDescription() != null ? b.getDescription() : "",
-                        b.getComment()     != null ? b.getComment()     : "",
-                        b.getCategoryId()  != null ? b.getCategoryId()  : ""
+                        beer.getBeerId(),
+                        beer.getName(),
+                        beer.getColor(),
+                        String.format("%.2f €", beer.getPrice() != null ? beer.getPrice() : 0.0),
+                        (beer.getContainsAlcool() != null && beer.getContainsAlcool()) ? "Yes" : "No",
+                        beer.getMarketLaunchDate() != null ? beer.getMarketLaunchDate() : "N/A",
+                        beer.getDescription() != null ? beer.getDescription() : "",
+                        beer.getComment()     != null ? beer.getComment()     : "",
+                        beer.getCategory()  != null ? beer.getCategory()  : ""
                 });
             }
         } catch (ReadException ex) {
