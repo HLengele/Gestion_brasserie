@@ -24,6 +24,15 @@ public class OrderManager implements IOrderManager {
     }
 
     public void addLineOrder(int orderId, int beerId, int quantity, double realPrice) throws Exception {
+        if (orderId <= 0 || beerId <= 0) {
+            throw new IllegalArgumentException("The order and beer IDs must be valid.");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("The quantity must be greater than zero.");
+        }
+        if (realPrice < 0) {
+            throw new IllegalArgumentException("The actual price cannot be negative.");
+        }
         orderDao.insertLineOrder(orderId, beerId, quantity, realPrice);
     }
 

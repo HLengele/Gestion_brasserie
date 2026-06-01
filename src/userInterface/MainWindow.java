@@ -27,10 +27,8 @@ public class MainWindow extends JFrame {
         mainMenu = new MainMenu(this);
         this.setJMenuBar(mainMenu);
 
-        // Affiche la page d'accueil par défaut
         changeCurrentPanel("Home", this);
 
-        // Gestion de la fermeture de la fenêtre
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {

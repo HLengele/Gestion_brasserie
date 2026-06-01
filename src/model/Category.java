@@ -8,7 +8,7 @@ public class Category {
 
     public Category(int categoryId, String name) throws NullValueException {
         this.categoryId = categoryId;
-        setName(name); // On passe par le setter pour activer la vérification
+        setName(name);
     }
 
     public int getCategoryId() {
@@ -24,15 +24,13 @@ public class Category {
     }
 
     public void setName(String name) throws NullValueException {
-        // Le filtre de vérification !
         if (name != null && !name.isBlank()) {
             this.name = name;
         } else {
-            throw new NullValueException("Le nom de la catégorie ne peut pas être vide.");
+            throw new NullValueException("The category name cannot be empty.");
         }
     }
 
-    // Très important pour l'affichage dans la ComboBox de ton CRUD !
     @Override
     public String toString() {
         return name;

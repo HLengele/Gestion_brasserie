@@ -17,15 +17,15 @@ public class Beer {
 
     public Beer(Integer beerId, String name, String color, Double price, String description,
                 Boolean containsAlcool, LocalDate marketLaunchDate, String comment, Category category) throws NullValueException {
-        this.beerId = beerId;
+        setBeerId(beerId);
         setName(name);
-        this.color = color;
+        setColor(color);
         setPrice(price);
-        this.description = description;
-        this.containsAlcool = containsAlcool;
-        this.marketLaunchDate = marketLaunchDate;
-        this.comment = comment;
+        setMarketLaunchDate(marketLaunchDate);
+        setContainsAlcool(containsAlcool);
         setCategory(category);
+        this.description = description;
+        this.comment = comment;
     }
 
     public Integer getBeerId() { return beerId; }
@@ -40,6 +40,30 @@ public class Beer {
     public String getColor() { return color; }
 
     public Double getPrice() { return price; }
+
+    public void setColor(String color) throws NullValueException {
+        if (color != null && !color.isBlank()) {
+            this.color = color;
+        } else {
+            throw new NullValueException("The beer color cannot be empty.");
+        }
+    }
+
+    public void setContainsAlcool(Boolean containsAlcool) throws NullValueException {
+        if (containsAlcool != null) {
+            this.containsAlcool = containsAlcool;
+        } else {
+            throw new NullValueException("Please specify if the beer contains alcohol (true or false).");
+        }
+    }
+
+    public void setMarketLaunchDate(LocalDate marketLaunchDate) throws IllegalArgumentException {
+        if (marketLaunchDate != null && marketLaunchDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("The market launch date cannot be in the future.");
+        }
+        this.marketLaunchDate = marketLaunchDate;
+    }
+
     public void setPrice(Double price) throws NullValueException {
         if (price == null || price < 0) throw new NullValueException("The price must be positive.");
         this.price = price;

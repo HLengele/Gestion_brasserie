@@ -22,7 +22,15 @@ public class BeerManager implements IBeerManager {
     }
 
     public void addBeer(Beer beer) throws Exception {
-        beerDao.insertBeer(beer);
+        if (beer == null) {
+            throw new IllegalArgumentException("The beer to add cannot be null.");
+        }
+        if (beer.getBeerId() != null && beer.getBeerId() > 0) {
+            throw new IllegalArgumentException("A new beer must not have an ID before insertion.");
+        }
+        else {
+            beerDao.insertBeer(beer);
+        }
     }
 
     public void updateBeer(Beer beer) throws Exception {
