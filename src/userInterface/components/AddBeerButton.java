@@ -27,13 +27,21 @@ public class AddBeerButton extends JButton {
                 beerForm.setCurrentBeerId(null);
                 Beer newBeer = beerForm.formToBeer();
                 parent.getApplicationController().addBeer(newBeer);
+
                 JOptionPane.showMessageDialog(parent, "Beer added successfully!");
+
                 if (beerForm.getBeerTable() != null) beerForm.getBeerTable().loadTable();
                 beerForm.beerToForm(null);
+
+            } catch (exception.NullValueException | IllegalArgumentException ex) {
+                JOptionPane.showMessageDialog(parent,
+                        ex.getMessage(),
+                        "Input Error", JOptionPane.WARNING_MESSAGE);
+
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(parent,
-                        "Error while adding: " + ex.getMessage(),
-                        "Error", JOptionPane.ERROR_MESSAGE);
+                        "System error: " + ex.getMessage(),
+                        "Critical Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

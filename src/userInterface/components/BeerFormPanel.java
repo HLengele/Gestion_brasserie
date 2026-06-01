@@ -53,7 +53,7 @@ public class BeerFormPanel extends JPanel {
         addRow("ID :",                       txtId);
         addRow("Name :",                     txtName);
         addRow("Color :",                    txtColor);
-        addRow("Price (€) :",               txtPrice);
+        addRow("Price (€) :",                txtPrice);
         addRow("Contains alcohol :",         chkAlcohol);
         addRow("Launch Date (YYYY-MM-DD) :", txtLaunchDate);
         addRow("Description :",              txtDescription);
@@ -117,7 +117,8 @@ public class BeerFormPanel extends JPanel {
         try {
             price = Double.parseDouble(txtPrice.getText().trim().replace(",", "."));
         } catch (NumberFormatException e) {
-            throw new Exception("The price format is invalid.");
+            // CORRECTION ICI : On utilise IllegalArgumentException pour déclencher l'avertissement UI
+            throw new IllegalArgumentException("The price format is invalid. Please enter a valid number.");
         }
 
         Boolean containsAlcool = chkAlcohol.isSelected();
@@ -128,7 +129,8 @@ public class BeerFormPanel extends JPanel {
             try {
                 launchDate = LocalDate.parse(dateTxt);
             } catch (DateTimeParseException ex) {
-                throw new Exception("The date format is incorrect. Use YYYY-MM-DD.");
+                // CORRECTION ICI : On utilise IllegalArgumentException
+                throw new IllegalArgumentException("The date format is incorrect. Use YYYY-MM-DD.");
             }
         }
 
@@ -144,6 +146,7 @@ public class BeerFormPanel extends JPanel {
             }
         }
 
+        // Si la date est vide (launchDate == null), la classe Beer lancera sa propre erreur !
         return new Beer(id, name, color, price, description, containsAlcool, launchDate, comment, category);
     }
 

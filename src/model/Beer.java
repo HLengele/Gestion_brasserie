@@ -57,10 +57,15 @@ public class Beer {
         }
     }
 
-    public void setMarketLaunchDate(LocalDate marketLaunchDate) throws IllegalArgumentException {
-        if (marketLaunchDate != null && marketLaunchDate.isAfter(LocalDate.now())) {
+    public void setMarketLaunchDate(LocalDate marketLaunchDate) throws NullValueException, IllegalArgumentException {
+        if (marketLaunchDate == null) {
+            throw new NullValueException("The market launch date is mandatory.");
+        }
+
+        if (marketLaunchDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("The market launch date cannot be in the future.");
         }
+
         this.marketLaunchDate = marketLaunchDate;
     }
 
