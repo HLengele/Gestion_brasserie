@@ -1,19 +1,19 @@
 package business;
 
-import dataAccess.CategoryDBAccess;
+import dataAccess.CategoryDataAccess; // Utiliser l'interface !
 import exception.ReadException;
 import model.Category;
 import java.util.ArrayList;
 
-public class CategoryManager {
+public class CategoryManager implements ICategoryManager {
 
-    private CategoryDBAccess categoryDBAccess;
+    private CategoryDataAccess categoryDataAccess;
 
-    public CategoryManager() {
-        this.categoryDBAccess = new CategoryDBAccess();
+    public CategoryManager(CategoryDataAccess categoryDataAccess) {
+        this.categoryDataAccess = categoryDataAccess;
     }
 
     public ArrayList<Category> getAllCategories() throws ReadException {
-        return categoryDBAccess.readAll();
+        return categoryDataAccess.readAll();
     }
 }

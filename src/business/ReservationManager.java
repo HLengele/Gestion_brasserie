@@ -1,21 +1,16 @@
 package business;
 
-import dataAccess.ReservationDBAccess;
 import dataAccess.ReservationDataAccess;
 import exception.ReadException;
 import model.Reservation;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class ReservationManager {
+public class ReservationManager implements IReservationManager {
+
     private ReservationDataAccess reservationDao;
 
-    public ReservationManager() {
-        setReservationDao(new ReservationDBAccess());
-    }
-
-    public void setReservationDao(ReservationDataAccess reservationDao) {
+    public ReservationManager(ReservationDataAccess reservationDao) {
         this.reservationDao = reservationDao;
     }
 

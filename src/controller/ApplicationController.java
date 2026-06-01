@@ -1,36 +1,26 @@
 package controller;
 
-import business.OrderManager;
-import business.CategoryManager;
-import business.BeerManager;
-import business.ReservationManager;
+import business.IBeerManager;
+import business.ICategoryManager;
+import business.IOrderManager;
+import business.IReservationManager;
 import exception.*;
 import model.*;
 import java.util.ArrayList;
 
-public class ApplicationController {
+public class ApplicationController implements IApplicationController {
 
-    private OrderManager orderManager;
-    private ReservationManager reservationManager;
-    private CategoryManager categoryManager;
-    private BeerManager beerManager;
+    private IOrderManager orderManager;
+    private IReservationManager reservationManager;
+    private ICategoryManager categoryManager;
+    private IBeerManager beerManager;
 
-    // ── Constructeur ───────────────────────────────────────────────────────────
-    public ApplicationController() {
-        setOrderManager(new OrderManager());
-        setCategoryManager(new CategoryManager());
-        setReservationManager(new ReservationManager());
-        setBeerManager(new BeerManager());
-    }
-
-    // ── Setters ────────────────────────────────────────────────────────────────
-    public void setOrderManager(OrderManager orderManager) { this.orderManager = orderManager; }
-    public void setCategoryManager(CategoryManager categoryManager) { this.categoryManager = categoryManager; }
-    public void setBeerManager(BeerManager beerManager) { this.beerManager = beerManager; }
-    public void setReservationManager(ReservationManager reservationManager) {
+    public ApplicationController(IOrderManager orderManager, ICategoryManager categoryManager, IReservationManager reservationManager, IBeerManager beerManager) {
+        this.orderManager = orderManager;
+        this.categoryManager = categoryManager;
         this.reservationManager = reservationManager;
+        this.beerManager = beerManager;
     }
-
 
     public ArrayList<Category> getAllCategories() throws ReadException {
         return categoryManager.getAllCategories();
@@ -58,7 +48,6 @@ public class ApplicationController {
     public void deleteBeer(int beerId) throws Exception {
         beerManager.deleteBeer(beerId);
     }
-
 
     public int addOrder(Order newOrder) throws AddOrderException {
         return orderManager.addOrder(newOrder);

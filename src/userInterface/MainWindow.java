@@ -1,6 +1,6 @@
 package userInterface;
 
-import controller.ApplicationController;
+import controller.IApplicationController; // N'oublie pas cet import !
 import userInterface.panel.PanelFactory;
 
 import javax.swing.*;
@@ -12,12 +12,12 @@ public class MainWindow extends JFrame {
 
     private Container frameContainer;
     private MainMenu mainMenu;
-    private ApplicationController applicationController;
+    private IApplicationController applicationController;
 
-    public MainWindow() {
+    public MainWindow(IApplicationController controller) {
         super("Brewery Management");
 
-        this.applicationController = new ApplicationController();
+        this.applicationController = controller;
 
         this.setBounds(50, 50, 1100, 850);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -27,8 +27,10 @@ public class MainWindow extends JFrame {
         mainMenu = new MainMenu(this);
         this.setJMenuBar(mainMenu);
 
+        // Affiche la page d'accueil par défaut
         changeCurrentPanel("Home", this);
 
+        // Gestion de la fermeture de la fenêtre
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -48,7 +50,7 @@ public class MainWindow extends JFrame {
         setVisible(true);
     }
 
-    public ApplicationController getApplicationController() {
+    public IApplicationController getApplicationController() {
         return applicationController;
     }
 }

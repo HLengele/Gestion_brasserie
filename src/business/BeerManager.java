@@ -1,24 +1,17 @@
 package business;
 
-import dataAccess.BeerDataAccess;
-import dataAccess.BeerDBAccess;
+import dataAccess.BeerDataAccess; // On importe l'interface, pas le DBAccess !
 import exception.ReadException;
 import model.Beer;
-
 import java.util.ArrayList;
 
-public class BeerManager {
+public class BeerManager implements IBeerManager {
 
     private BeerDataAccess beerDao;
 
-    public BeerManager() {
-        setBeerDao(new BeerDBAccess());
-    }
-
-    public void setBeerDao(BeerDataAccess beerDao) {
+    public BeerManager(BeerDataAccess beerDao) {
         this.beerDao = beerDao;
     }
-
 
     public ArrayList<Beer> getAllBeers() throws ReadException {
         return beerDao.readAll();
