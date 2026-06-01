@@ -9,12 +9,17 @@ import java.awt.*;
 public class HomePanel extends JPanel {
 
     public HomePanel(MainWindow parent) {
+        // On repasse sur un BorderLayout pour la fenêtre globale
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(245, 245, 245));
 
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setOpaque(false);
+        // 1. LA ZONE CENTRALE (Textes uniquement)
+        JPanel centerTextPanel = new JPanel(new GridBagLayout()); // Centre parfaitement son contenu
+        centerTextPanel.setOpaque(false);
+
+        JPanel textStack = new JPanel();
+        textStack.setLayout(new BoxLayout(textStack, BoxLayout.Y_AXIS));
+        textStack.setOpaque(false);
 
         JLabel lblWelcome = new JLabel("Welcome", SwingConstants.CENTER);
         lblWelcome.setFont(new Font("Serif", Font.PLAIN, 72));
@@ -22,21 +27,21 @@ public class HomePanel extends JPanel {
         lblWelcome.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel lblSubtitle = new JLabel("Brewery Management System");
-        lblSubtitle.setFont(new Font("Serif", Font.ITALIC, 22));
+        lblSubtitle.setFont(new Font("Serif", Font.ITALIC, 24));
         lblSubtitle.setForeground(new Color(127, 140, 141));
         lblSubtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        textStack.add(lblWelcome);
+        textStack.add(Box.createVerticalStrut(15));
+        textStack.add(lblSubtitle);
+
+        centerTextPanel.add(textStack);
+
         MovingImagePanel movingAnimation = new MovingImagePanel();
-        movingAnimation.setAlignmentX(Component.CENTER_ALIGNMENT);
+        movingAnimation.setPreferredSize(new Dimension(0, 150));
 
-        centerPanel.add(Box.createVerticalGlue());
-        centerPanel.add(lblWelcome);
-        centerPanel.add(Box.createVerticalStrut(15));
-        centerPanel.add(lblSubtitle);
-        centerPanel.add(Box.createVerticalStrut(20));
-        centerPanel.add(movingAnimation); // L'image va défiler sous le titre
-        centerPanel.add(Box.createVerticalGlue());
-
-        this.add(centerPanel, BorderLayout.CENTER);
+        // 3. ASSEMBLAGE
+        this.add(centerTextPanel, BorderLayout.CENTER); // Les textes au milieu
+        this.add(movingAnimation, BorderLayout.SOUTH);  // L'animation traverse tout le bas !
     }
 }
