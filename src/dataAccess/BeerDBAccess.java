@@ -27,7 +27,6 @@ public class BeerDBAccess implements BeerDataAccess {
                 statement.setDate(6, beer.getMarketLaunchDate() != null ? Date.valueOf(beer.getMarketLaunchDate()) : null);
                 statement.setString(7, beer.getComment());
 
-                // MODIFICATION : On va chercher l'ID dans l'objet Category s'il existe
                 if (beer.getCategory() != null) {
                     statement.setInt(8, beer.getCategory().getCategoryId());
                 } else {
@@ -86,7 +85,6 @@ public class BeerDBAccess implements BeerDataAccess {
 
     @Override
     public Beer readById(int id) throws ReadException {
-        // MODIFICATION : LEFT JOIN ici aussi
         String sql = "SELECT b.*, c.id AS catId, c.name AS catName " +
                 "FROM Beer b " +
                 "LEFT JOIN Category c ON b.categoryId = c.id " +
@@ -141,7 +139,6 @@ public class BeerDBAccess implements BeerDataAccess {
             statement.setDate(6, beer.getMarketLaunchDate() != null ? Date.valueOf(beer.getMarketLaunchDate()) : null);
             statement.setString(7, beer.getComment());
 
-            // MODIFICATION : Extraction de l'ID depuis l'objet
             if (beer.getCategory() != null) {
                 statement.setInt(8, beer.getCategory().getCategoryId());
             } else {

@@ -8,16 +8,21 @@ import java.util.ArrayList;
 public class OrderManager implements IOrderManager {
 
     private OrderDataAccess orderDao;
+    private LineOrderDataAccess lineOrderDao;
     private CityDataAccess cityDao;
     private EmployeeDataAccess employeeDao;
     private TableDataAccess tableDao;
 
-    public OrderManager(OrderDataAccess orderDao, CityDataAccess cityDao, EmployeeDataAccess employeeDao, TableDataAccess tableDao) {
-        this.orderDao = orderDao;
-        this.cityDao = cityDao;
-        this.employeeDao = employeeDao;
-        this.tableDao = tableDao;
+    public OrderManager(OrderDataAccess orderDao, LineOrderDataAccess lineOrderDao,
+                        CityDataAccess cityDao, EmployeeDataAccess employeeDao,
+                        TableDataAccess tableDao) {
+        this.orderDao     = orderDao;
+        this.lineOrderDao = lineOrderDao;
+        this.cityDao      = cityDao;
+        this.employeeDao  = employeeDao;
+        this.tableDao     = tableDao;
     }
+
 
     public int addOrder(Order newOrder) throws AddOrderException {
         return orderDao.insertOrder(newOrder);
@@ -33,7 +38,7 @@ public class OrderManager implements IOrderManager {
         if (realPrice < 0) {
             throw new IllegalArgumentException("The actual price cannot be negative.");
         }
-        orderDao.insertLineOrder(orderId, beerId, quantity, realPrice);
+        lineOrderDao.insertLineOrder(orderId, beerId, quantity, realPrice);
     }
 
     public ArrayList<Table> getAllTables() throws ReadException {
@@ -44,6 +49,18 @@ public class OrderManager implements IOrderManager {
         if (tableNumber <= 0) {
             throw new IllegalArgumentException("The table number must be greater than 0.");
         }
-        return orderDao.getTotalPriceByTable(tableNumber);
+        ArrayList<LineOrder> lineOrders = lineOrderDao.getLineOrdersByTable(tableNumber);
+        return calculateCartTotal(lineOrders);
+    }
+
+    public double calculateCartTotal(ArrayList<LineOrder> cart) {
+        if (cart == null || cart.isEmpty()) {
+            return 0.0;
+        }
+        double total = 0.0;
+        for (LineOrder line : cart) {
+            total += line.getQuantity() * line.getRealPrice();
+        }
+        return total;
     }
 }

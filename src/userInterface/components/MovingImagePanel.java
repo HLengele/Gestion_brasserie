@@ -3,7 +3,6 @@ package userInterface.components;
 import javax.swing.*;
 import java.awt.*;
 
-// Implémentation de Runnable (Choix 1 de ton cours sur les Threads)
 public class MovingImagePanel extends JPanel implements Runnable {
 
     private Image image;

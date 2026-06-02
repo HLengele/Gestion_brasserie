@@ -21,7 +21,6 @@ public class TableDBAccess implements TableDataAccess {
                 String location = data.getString("location");
                 if (data.wasNull()) location = null;
 
-                // Utilisation stricte des types primitifs int
                 int tableNumber = data.getInt("tableNumber");
                 int nbPlace = data.getInt("nbPlace");
 
@@ -49,7 +48,6 @@ public class TableDBAccess implements TableDataAccess {
                 String location = data.getString("location");
                 if (data.wasNull()) location = null;
 
-                // Utilisation stricte des types primitifs int
                 int tableNumber = data.getInt("tableNumber");
                 int nbPlace = data.getInt("nbPlace");
 

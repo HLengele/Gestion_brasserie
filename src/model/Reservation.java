@@ -18,6 +18,15 @@ public class Reservation {
         this.table = table;
     }
 
+    public void setNbPeople(int nbPeople) {
+        if (nbPeople <= 0) throw new IllegalArgumentException("A reservation must be for at least 1 person.");
+        this.nbPeople = nbPeople;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
     public int getId() {
         return id;
     }

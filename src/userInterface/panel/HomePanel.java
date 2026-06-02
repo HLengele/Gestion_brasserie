@@ -9,11 +9,9 @@ import java.awt.*;
 public class HomePanel extends JPanel {
 
     public HomePanel(MainWindow parent) {
-        // On repasse sur un BorderLayout pour la fenêtre globale
         this.setLayout(new BorderLayout());
         this.setBackground(new Color(245, 245, 245));
 
-        // 1. LA ZONE CENTRALE (Textes uniquement)
         JPanel centerTextPanel = new JPanel(new GridBagLayout()); // Centre parfaitement son contenu
         centerTextPanel.setOpaque(false);
 
@@ -40,7 +38,6 @@ public class HomePanel extends JPanel {
         MovingImagePanel movingAnimation = new MovingImagePanel();
         movingAnimation.setPreferredSize(new Dimension(0, 150));
 
-        // 3. ASSEMBLAGE
         this.add(centerTextPanel, BorderLayout.CENTER); // Les textes au milieu
         this.add(movingAnimation, BorderLayout.SOUTH);  // L'animation traverse tout le bas !
     }

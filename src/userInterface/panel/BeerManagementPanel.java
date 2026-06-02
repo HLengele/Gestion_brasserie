@@ -25,8 +25,6 @@ public class BeerManagementPanel extends JPanel {
         beerTable = new BeerTable(parent);
         JScrollPane scrollPane = new JScrollPane(beerTable);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Beer List"));
-        // J'ai retiré le setPreferredSize ici : le CENTER s'étire automatiquement
-        // pour remplir tout l'espace disponible, ce qui est parfait pour une table.
         this.add(scrollPane, BorderLayout.CENTER);
 
         beerForm = new BeerFormPanel(parent);
@@ -43,10 +41,8 @@ public class BeerManagementPanel extends JPanel {
 
         JScrollPane formScroll = new JScrollPane(beerForm);
         formScroll.setBorder(null);
-        // On modifie la dimension : largeur 0 (pour s'adapter à la fenêtre), hauteur 350
         formScroll.setPreferredSize(new Dimension(0, 500));
 
-        // CORRECTION ICI : On place le formulaire au SUD (en bas) au lieu de l'EST
         this.add(formScroll, BorderLayout.SOUTH);
 
         beerTable.linkToForm(beerForm);

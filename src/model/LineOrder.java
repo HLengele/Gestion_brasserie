@@ -12,8 +12,8 @@ public class LineOrder {
     public LineOrder(int beerId, String beerName, int quantity, double realPrice) {
         this.beerId = beerId;
         this.beerName = beerName;
-        this.quantity = quantity;
-        this.realPrice = realPrice;
+        setQuantity(quantity);
+        setRealPrice(realPrice);
     }
 
     public int getQuantity() { return quantity; }
@@ -21,5 +21,12 @@ public class LineOrder {
     public int getBeerId() { return beerId; }
     public String getBeerName() { return beerName; }
 
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setRealPrice(double realPrice) {
+        this.realPrice = realPrice;
+    }
+
+    public void setQuantity(int quantity) {
+        if (quantity <= 0) throw new IllegalArgumentException("The quantity must be greater than zero.");
+        this.quantity = quantity;
+    }
 }

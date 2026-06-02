@@ -15,13 +15,11 @@ public class CategoryDBAccess implements CategoryDataAccess {
         ArrayList<Category> categories = new ArrayList<>();
         String sql = "SELECT * FROM Category ORDER BY name";
 
-        // Using try-with-resources to automatically close statement and data
         try (Connection connection = SingletonConnection.getInstance();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet data = statement.executeQuery()) {
 
             while (data.next()) {
-                // The constructor may throw a NullValueException
                 categories.add(new Category(
                         data.getInt("id"),
                         data.getString("name")
@@ -29,7 +27,6 @@ public class CategoryDBAccess implements CategoryDataAccess {
             }
             return categories;
         } catch (Exception e) {
-            // Catches everything (SQLException or NullValueException)
             throw new ReadException("Error while reading categories: " + e.getMessage());
         }
     }
@@ -51,7 +48,7 @@ public class CategoryDBAccess implements CategoryDataAccess {
                     );
                 }
             }
-            return null; // Returns null if no category found with this ID
+            return null;
         } catch (Exception e) {
             throw new ReadException("Error while searching for category ID " + id + ": " + e.getMessage());
         }

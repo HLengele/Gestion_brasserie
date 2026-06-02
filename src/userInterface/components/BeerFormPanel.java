@@ -1,5 +1,6 @@
 package userInterface.components;
 
+import exception.NullValueException;
 import model.Beer;
 import model.Category;
 import userInterface.MainWindow;
@@ -10,30 +11,38 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BeerFormPanel extends JPanel {
 
-    private JTextField txtId;
-    private JTextField txtName;
-    private JTextField txtColor;
-    private JTextField txtPrice;
-    private JCheckBox  chkAlcohol;
-    private JTextField txtLaunchDate;
-    private JTextField txtDescription;
-    private JTextField txtComment;
-    private JComboBox<String> comboCategory;
+    private JTextField          txtId;
+    private JTextField          txtName;
+    private JTextField          txtColor;
+    private JTextField          txtPrice;
+    private JCheckBox           chkAlcohol;
+    private JTextField          txtLaunchDate;
+    private JTextField          txtDescription;
+    private JTextField          txtComment;
+    private JComboBox<Category> comboCategory;   // CORRECTION : Category au lieu de String
 
     private AddBeerButton    addButton;
     private UpdateBeerButton updateButton;
     private DeleteBeerButton deleteButton;
     private ClearBeerButton  clearButton;
 
-    private JPanel groupButtons;
+    private JPanel    groupButtons;
     private BeerTable beerTable;
 
     public BeerFormPanel(MainWindow parent) {
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        JLabel hintLabel = new JLabel("Fields marked with * are mandatory.");
+        hintLabel.setForeground(Color.GRAY);
+        hintLabel.setFont(hintLabel.getFont().deriveFont(Font.ITALIC, 11f));
+        hintLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        this.add(hintLabel);
+        this.add(Box.createVerticalStrut(10));
 
         txtId = new JTextField();
         txtId.setEditable(false);
@@ -48,17 +57,26 @@ public class BeerFormPanel extends JPanel {
         txtComment     = new JTextField();
 
         comboCategory = new JComboBox<>();
-        comboCategory.addItem("-- Select a category --");
+        comboCategory.addItem(null);
+        comboCategory.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                setText(value == null ? "-- Select a category --" : ((Category) value).getName());
+                return this;
+            }
+        });
 
-        addRow("ID :",                       txtId);
-        addRow("Name :",                     txtName);
-        addRow("Color :",                    txtColor);
-        addRow("Price (€) :",                txtPrice);
-        addRow("Contains alcohol :",         chkAlcohol);
-        addRow("Launch Date (YYYY-MM-DD) :", txtLaunchDate);
-        addRow("Description :",              txtDescription);
-        addRow("Comment :",                  txtComment);
-        addRow("Category :",                 comboCategory);
+        addRow("ID :",                         txtId,         false);
+        addRow("Name * :",                     txtName,       true);
+        addRow("Color * :",                    txtColor,      true);
+        addRow("Price (€) * :",                txtPrice,      true);
+        addRow("Contains alcohol * :",         chkAlcohol,    true);
+        addRow("Launch date * (YYYY-MM-DD) :", txtLaunchDate, true);
+        addRow("Description :",                txtDescription, false);
+        addRow("Comment :",                    txtComment,    false);
+        addRow("Category :",                   comboCategory, false);
 
         addButton    = new AddBeerButton(this, parent);
         updateButton = new UpdateBeerButton(this, parent);
@@ -80,8 +98,11 @@ public class BeerFormPanel extends JPanel {
         this.add(groupButtons);
     }
 
-    private void addRow(String labelText, JComponent field) {
+    private void addRow(String labelText, JComponent field, boolean mandatory) {
         JLabel label = new JLabel(labelText);
+        if (mandatory) {
+            label.setForeground(new Color(160, 40, 40));
+        }
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         field.setAlignmentX(Component.LEFT_ALIGNMENT);
         if (field instanceof JTextField) {
@@ -94,59 +115,85 @@ public class BeerFormPanel extends JPanel {
 
     public void populateCategories(ArrayList<Category> categories) {
         comboCategory.removeAllItems();
-        comboCategory.addItem("-- Select a category --");
+        comboCategory.addItem(null);
         if (categories != null) {
             for (Category cat : categories) {
-                comboCategory.addItem(cat.getName() + " (" + cat.getCategoryId() + ")");
+                comboCategory.addItem(cat);
             }
         }
     }
 
-    public Beer formToBeer() throws Exception {
+    public Beer formToBeer() throws NullValueException {
+
+        List<String> errors = new ArrayList<>();
+
         Integer id = null;
-        if (!txtId.getText().trim().isEmpty()) {
-            id = Integer.parseInt(txtId.getText().trim());
+        String idTxt = txtId.getText().trim();
+        if (!idTxt.isEmpty()) {
+            try {
+                id = Integer.parseInt(idTxt);
+            } catch (NumberFormatException e) {
+                errors.add("- ID : invalid format.");
+            }
         }
 
-        String name        = txtName.getText().trim();
-        String color       = txtColor.getText().trim();
-        String description = txtDescription.getText().trim().isEmpty() ? null : txtDescription.getText().trim();
-        String comment     = txtComment.getText().trim().isEmpty()     ? null : txtComment.getText().trim();
-
-        Double price;
-        try {
-            price = Double.parseDouble(txtPrice.getText().trim().replace(",", "."));
-        } catch (NumberFormatException e) {
-            // CORRECTION ICI : On utilise IllegalArgumentException pour déclencher l'avertissement UI
-            throw new IllegalArgumentException("The price format is invalid. Please enter a valid number.");
+        String name = txtName.getText().trim();
+        if (name.isEmpty()) {
+            errors.add("- Name : this field is required.");
         }
 
-        Boolean containsAlcool = chkAlcohol.isSelected();
+        String color = txtColor.getText().trim();
+        if (color.isEmpty()) {
+            errors.add("- Color : this field is required.");
+        }
+
+        Double price = null;
+        String priceTxt = txtPrice.getText().trim().replace(",", ".");
+        if (priceTxt.isEmpty()) {
+            errors.add("- Price : this field is required.");
+        } else {
+            try {
+                price = Double.parseDouble(priceTxt);
+                if (price < 0) {
+                    errors.add("- Price : must be a positive value (≥ 0).");
+                }
+            } catch (NumberFormatException e) {
+                errors.add("- Price : invalid format. Please enter a number (e.g. 4.50).");
+            }
+        }
+
 
         LocalDate launchDate = null;
         String dateTxt = txtLaunchDate.getText().trim();
-        if (!dateTxt.isEmpty()) {
+        if (dateTxt.isEmpty()) {
+            errors.add("- Launch date : this field is required (format YYYY-MM-DD).");
+        } else {
             try {
                 launchDate = LocalDate.parse(dateTxt);
-            } catch (DateTimeParseException ex) {
-                // CORRECTION ICI : On utilise IllegalArgumentException
-                throw new IllegalArgumentException("The date format is incorrect. Use YYYY-MM-DD.");
+                if (launchDate.isAfter(LocalDate.now())) {
+                    errors.add("- Launch date : cannot be set in the future.");
+                }
+            } catch (DateTimeParseException e) {
+                errors.add("- Launch date : invalid format. Use YYYY-MM-DD (e.g. 2023-05-14).");
             }
         }
+        Boolean containsAlcool = chkAlcohol.isSelected();
+        String description = txtDescription.getText().trim().isEmpty()
+                ? null
+                : txtDescription.getText().trim();
 
-        Category category = null;
-        String selectedCat = (String) comboCategory.getSelectedItem();
-        if (selectedCat != null && !selectedCat.startsWith("--")) {
-            int openParen  = selectedCat.lastIndexOf("(");
-            int closeParen = selectedCat.lastIndexOf(")");
-            if (openParen != -1 && closeParen != -1) {
-                Integer categoryId = Integer.parseInt(selectedCat.substring(openParen + 1, closeParen));
-                String  catName    = selectedCat.substring(0, openParen).trim();
-                category = new Category(categoryId, catName);
-            }
+        String comment = txtComment.getText().trim().isEmpty()
+                ? null
+                : txtComment.getText().trim();
+
+        Category category = (Category) comboCategory.getSelectedItem();
+
+        if (!errors.isEmpty()) {
+            String msg = "Please correct the following mandatory fields:\n\n"
+                    + String.join("\n", errors);
+            throw new NullValueException(msg);
         }
 
-        // Si la date est vide (launchDate == null), la classe Beer lancera sa propre erreur !
         return new Beer(id, name, color, price, description, containsAlcool, launchDate, comment, category);
     }
 
@@ -160,7 +207,7 @@ public class BeerFormPanel extends JPanel {
             txtLaunchDate.setText("");
             txtDescription.setText("");
             txtComment.setText("");
-            comboCategory.setSelectedIndex(0);
+            comboCategory.setSelectedIndex(0); // retour au placeholder
             return;
         }
 
@@ -169,21 +216,21 @@ public class BeerFormPanel extends JPanel {
         txtColor.setText(beer.getColor() != null ? beer.getColor()  : "");
         txtPrice.setText(beer.getPrice() != null ? String.valueOf(beer.getPrice()) : "");
         chkAlcohol.setSelected(beer.getContainsAlcool() != null && beer.getContainsAlcool());
-        txtLaunchDate.setText(beer.getMarketLaunchDate() != null ? beer.getMarketLaunchDate().toString() : "");
+        txtLaunchDate.setText(beer.getMarketLaunchDate() != null
+                ? beer.getMarketLaunchDate().toString() : "");
         txtDescription.setText(beer.getDescription() != null ? beer.getDescription() : "");
-        txtComment.setText(beer.getComment()          != null ? beer.getComment()    : "");
+        txtComment.setText(beer.getComment()         != null ? beer.getComment()     : "");
 
+        comboCategory.setSelectedIndex(0); // placeholder par défaut
         Category cat = beer.getCategory();
         if (cat != null) {
             for (int i = 0; i < comboCategory.getItemCount(); i++) {
-                String item = comboCategory.getItemAt(i);
-                if (item.endsWith("(" + cat.getCategoryId() + ")")) {
+                Category item = comboCategory.getItemAt(i);
+                if (item != null && item.getCategoryId() == cat.getCategoryId()) {
                     comboCategory.setSelectedIndex(i);
                     break;
                 }
             }
-        } else {
-            comboCategory.setSelectedIndex(0);
         }
     }
 
@@ -196,6 +243,6 @@ public class BeerFormPanel extends JPanel {
         txtId.setText(id == null ? "" : String.valueOf(id));
     }
 
-    public BeerTable getBeerTable() { return beerTable; }
-    public void setBeerTable(BeerTable beerTable) { this.beerTable = beerTable; }
+    public BeerTable getBeerTable()                { return beerTable; }
+    public void setBeerTable(BeerTable beerTable)  { this.beerTable = beerTable; }
 }

@@ -14,7 +14,6 @@ public class ReservationDBAccess implements ReservationDataAccess {
     public ArrayList<Reservation> getReservationsBetweenDates(LocalDate start, LocalDate end) throws ReadException {
         ArrayList<Reservation> list = new ArrayList<>();
 
-        // MODIFICATION: Added backticks around the reserved word `table`
         String sql = "SELECT r.reservationId, r.date, r.nbPeople, " +
                 "       c.customerId, c.name AS customerName, c.phone, c.email, " +
                 "       ci.id AS cityId, ci.name AS cityName, ci.postalCode, " +
@@ -31,36 +30,36 @@ public class ReservationDBAccess implements ReservationDataAccess {
             statement.setDate(1, java.sql.Date.valueOf(start));
             statement.setDate(2, java.sql.Date.valueOf(end));
 
-            try (ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
+            try (ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
 
                     City city = null;
-                    if (rs.getInt("cityId") != 0) {
+                    if (result.getInt("cityId") != 0) {
                         city = new City(
-                                rs.getInt("cityId"),
-                                rs.getString("cityName"),
-                                rs.getString("postalCode")
+                                result.getInt("cityId"),
+                                result.getString("cityName"),
+                                result.getString("postalCode")
                         );
                     }
 
                     Customer customer = new Customer(
-                            rs.getInt("customerId"),
-                            rs.getString("email"),
-                            rs.getString("phone"),
-                            rs.getString("customerName"),
+                            result.getInt("customerId"),
+                            result.getString("email"),
+                            result.getString("phone"),
+                            result.getString("customerName"),
                             city
                     );
 
                     Table table = new Table(
-                            rs.getInt("tableNumber"),
-                            rs.getInt("nbPlace"),
-                            rs.getString("location")
+                            result.getInt("tableNumber"),
+                            result.getInt("nbPlace"),
+                            result.getString("location")
                     );
 
                     Reservation reservation = new Reservation(
-                            rs.getInt("reservationId"),
-                            rs.getTimestamp("date").toLocalDateTime().toLocalDate(),
-                            rs.getInt("nbPeople"),
+                            result.getInt("reservationId"),
+                            result.getTimestamp("date").toLocalDateTime().toLocalDate(),
+                            result.getInt("nbPeople"),
                             customer,
                             table
                     );
